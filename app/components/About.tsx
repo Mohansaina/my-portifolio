@@ -142,9 +142,8 @@ export const About: React.FC = () => {
             ref={scrollTextRef}
             className="char-reveal font-display-lg text-2xl md:text-3xl leading-relaxed text-on-surface mb-12"
           >
-            Hello! I'm Mohan Ruttala, a passionate Full Stack Developer based in Visakhapatnam, Andhra Pradesh.
-            I specialize in building modern, high-performance web applications with cutting-edge tech stacks and a focus on pixel-perfect user experience.
-            With a strong foundation in both frontend interfaces and backend architecture, I transform complex business challenges into sleek, robust digital solutions.
+            Hello! I'm Mohan Ruttala, a passionate Full-Stack Engineer & E-Commerce Developer based in Visakhapatnam, Andhra Pradesh.
+            I specialize in joining tech startups as a core engineer to build high-scale 0-to-1 web applications, as well as crafting bespoke luxury jewelry store websites with interactive 3D product previews and seamless multi-currency checkout.
           </div>
         )}
 

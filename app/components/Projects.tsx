@@ -10,6 +10,26 @@ export const Projects: React.FC = () => {
 
   const projects: ProjectData[] = [
     {
+      id: "aurajewels",
+      title: "AuraJewels - Luxury Jewelry Store & 3D Ring Builder",
+      category: "LUXURY E-COMMERCE / 3D WEB / SHOPIFY & NEXT.JS",
+      year: "2025",
+      description: "Bespoke luxury jewelry e-commerce store with interactive 3D diamond ring configurator & instant gold pricing.",
+      problem: "Traditional online jewelry sites lack tactile 3D customization, resulting in lower buyer confidence for high-end diamond rings and custom gold jewelry.",
+      solution: "Engineered a Next.js 15 headless e-commerce store featuring real-time 3D gemstone customization, diamond clarity selectors, live gold price sync, and multi-currency Stripe checkout.",
+      features: [
+        "Interactive 3D Diamond & Gold Ring Builder",
+        "Live Carat & Gemstone Price Calculation Engine",
+        "Headless Next.js 15 Storefront with Shopify Backend",
+        "Multi-Currency Stripe & Luxury Gift Checkout",
+      ],
+      techStack: ["React 19", "Next.js 15", "Three.js / Canvas", "Tailwind CSS", "Shopify API", "Stripe"],
+      demoUrl: "#services",
+      repoUrl: "https://github.com/Mohansaina/my-portifolio",
+      image1: "/jewelry_store_hero.png",
+      image2: "/jewelry_customizer_app.png",
+    },
+    {
       id: "businesshelp",
       title: "AI Review & Reputation Tool",
       category: "AI / BUSINESS / ANALYTICS",

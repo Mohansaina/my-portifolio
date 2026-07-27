@@ -50,7 +50,7 @@ export const Hero: React.FC<HeroProps> = ({ onMagnetButton, onMagnetButtonReset 
         <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-surface-container-high/60 border border-white/10 backdrop-blur-md mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
           <span className="font-label-caps text-xs text-on-surface-variant/90 tracking-widest uppercase">
-            Available for Freelance & Full-time Roles
+            OPEN FOR STARTUP ROLES & JEWELRY STORE E-COMMERCE
           </span>
         </div>
 
@@ -66,7 +66,7 @@ export const Hero: React.FC<HeroProps> = ({ onMagnetButton, onMagnetButtonReset 
           onMouseLeave={handleMouseLeave}
         >
           {/* Pulsing Aura Rings */}
-          <div className="absolute inset-0 rounded-full border border-white/10 scale-105 group-hover:scale-110 group-hover:border-cyan-500/30 transition-all duration-700 animate-pulse pointer-events-none" />
+          <div className="absolute inset-0 rounded-full border border-white/10 scale-105 group-hover:scale-110 group-hover:border-amber-400/40 transition-all duration-700 animate-pulse pointer-events-none" />
           <div className="absolute inset-0 rounded-full border border-white/5 scale-110 group-hover:scale-120 group-hover:border-cyan-500/20 transition-all duration-1000 animate-ping pointer-events-none [animation-duration:4s]" />
 
           <div ref={magnetWrapRef} className="magnet-wrap w-full h-full">
@@ -78,9 +78,9 @@ export const Hero: React.FC<HeroProps> = ({ onMagnetButton, onMagnetButtonReset 
           </div>
 
           {/* Interactive Tech Orbits */}
-          <div className="absolute -top-4 -left-4 w-14 h-14 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-cyan-400/40 transition-all duration-300 animate-float-slow select-none">
-            <span className="material-symbols-outlined accent-text text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-              terminal
+          <div className="absolute -top-4 -left-4 w-14 h-14 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-amber-400/50 transition-all duration-300 animate-float-slow select-none">
+            <span className="material-symbols-outlined text-amber-400 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+              diamond
             </span>
           </div>
           <div className="absolute -bottom-4 -right-4 w-14 h-14 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-cyan-400/40 transition-all duration-300 animate-float-medium select-none">
@@ -90,7 +90,7 @@ export const Hero: React.FC<HeroProps> = ({ onMagnetButton, onMagnetButtonReset 
           </div>
           <div className="absolute top-10 -right-10 w-12 h-12 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-cyan-400/40 transition-all duration-300 animate-float-fast select-none">
             <span className="material-symbols-outlined accent-text text-xl">
-              cloud
+              terminal
             </span>
           </div>
           <div className="absolute bottom-10 -left-10 w-12 h-12 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-cyan-400/40 transition-all duration-300 animate-float-slow select-none">
