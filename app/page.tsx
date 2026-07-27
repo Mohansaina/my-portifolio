@@ -36,20 +36,20 @@ export default function Home() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Snappy Magnetic Button Hover Helper
+  // Silky Magnetic Button Hover Helper
   const handleMagnetButton = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
     const btn = e.currentTarget;
     const rect = btn.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    btn.style.transform = `translate(${x * 0.35}px, ${y * 0.35}px) scale(1.05)`;
-    btn.style.transition = "transform 0.1s ease-out";
+    btn.style.transform = `translate3d(${x * 0.28}px, ${y * 0.28}px, 0) scale(1.04)`;
+    btn.style.transition = "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
   };
 
   const handleMagnetButtonReset = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
     const btn = e.currentTarget;
-    btn.style.transform = "translate(0px, 0px) scale(1)";
-    btn.style.transition = "transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)";
+    btn.style.transform = "translate3d(0px, 0px, 0) scale(1)";
+    btn.style.transition = "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
   };
 
   return (

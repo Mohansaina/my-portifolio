@@ -64,9 +64,9 @@ export const GlobalBackground: React.FC = () => {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Smooth mouse lerping
-      currentMouse.x += (targetMouse.x - currentMouse.x) * 0.06;
-      currentMouse.y += (targetMouse.y - currentMouse.y) * 0.06;
+      // Smooth mouse lerping for liquid physics
+      currentMouse.x += (targetMouse.x - currentMouse.x) * 0.04;
+      currentMouse.y += (targetMouse.y - currentMouse.y) * 0.04;
 
       // Draw interactive mouse energy aura in canvas
       const mouseGradient = ctx.createRadialGradient(
