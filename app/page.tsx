@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { AudioProvider } from "./components/AudioContext";
 import { CustomCursor } from "./components/CustomCursor";
+import { GlobalBackground } from "./components/GlobalBackground";
 import { Toast, ToastMessage } from "./components/Toast";
 import { FloatingControls } from "./components/FloatingControls";
 import { Navbar } from "./components/Navbar";
@@ -53,6 +54,7 @@ export default function Home() {
   return (
     <AudioProvider>
       <div className="relative min-h-screen bg-[#07080c] text-on-surface">
+        <GlobalBackground />
         <CustomCursor />
         <Toast toasts={toasts} onDismiss={removeToast} />
         <FloatingControls />
