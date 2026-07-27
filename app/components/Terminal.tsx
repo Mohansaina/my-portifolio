@@ -40,7 +40,7 @@ export const Terminal: React.FC = () => {
       });
     } else if (cmd === "contact") {
       newHistory.push({
-        text: "Email: ruttalamohan23@gmail.com\nGitHub: github.com/Mohansaina\nLinkedIn: linkedin.com/in/ruttala-mohan-sai-nandakishore-a73484309",
+        text: "Email: ruttalamohan23@gmail.com\nLinkedIn: linkedin.com/in/mohan-sai-ruttala-a73484309\nGitHub: github.com/Mohansaina\nInstagram: instagram.com/mohan_23_03_\nX: x.com/MohanRutta17691",
         isCmd: false,
       });
     } else if (cmd === "clear") {

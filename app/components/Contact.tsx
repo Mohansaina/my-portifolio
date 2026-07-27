@@ -71,22 +71,42 @@ export const Contact: React.FC<ContactProps> = ({
               ruttalamohan23@gmail.com
             </a>
 
-            <div className="flex gap-6 items-center">
+            <div className="flex flex-wrap gap-3 items-center">
               <a
-                className="font-label-caps text-xs uppercase tracking-widest text-on-surface-variant hover:text-cyan-400 transition-colors"
+                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 hover:text-cyan-300 font-label-caps text-xs uppercase tracking-widest text-on-surface-variant transition-all flex items-center gap-2 group"
+                href="https://www.linkedin.com/in/mohan-sai-ruttala-a73484309/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="material-symbols-outlined text-sm text-cyan-400 group-hover:scale-110 transition-transform">work</span>
+                LinkedIn ↗
+              </a>
+              <a
+                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 hover:text-cyan-300 font-label-caps text-xs uppercase tracking-widest text-on-surface-variant transition-all flex items-center gap-2 group"
                 href="https://github.com/Mohansaina"
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <span className="material-symbols-outlined text-sm text-cyan-400 group-hover:scale-110 transition-transform">code</span>
                 GitHub ↗
               </a>
               <a
-                className="font-label-caps text-xs uppercase tracking-widest text-on-surface-variant hover:text-cyan-400 transition-colors"
-                href="https://www.linkedin.com/in/ruttala-mohan-sai-nandakishore-a73484309/"
+                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-pink-500/50 hover:bg-pink-500/10 hover:text-pink-300 font-label-caps text-xs uppercase tracking-widest text-on-surface-variant transition-all flex items-center gap-2 group"
+                href="https://www.instagram.com/mohan_23_03_/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                LinkedIn ↗
+                <span className="material-symbols-outlined text-sm text-pink-400 group-hover:scale-110 transition-transform">photo_camera</span>
+                Instagram ↗
+              </a>
+              <a
+                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-sky-400/50 hover:bg-sky-500/10 hover:text-sky-300 font-label-caps text-xs uppercase tracking-widest text-on-surface-variant transition-all flex items-center gap-2 group"
+                href="https://x.com/MohanRutta17691"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="material-symbols-outlined text-sm text-sky-400 group-hover:scale-110 transition-transform">tag</span>
+                X (Twitter) ↗
               </a>
             </div>
           </div>
