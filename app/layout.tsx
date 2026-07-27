@@ -1,17 +1,33 @@
 import type { Metadata } from "next";
-import { Kanit } from "next/font/google";
+import { Kanit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const kanit = Kanit({
   variable: "--font-kanit",
   subsets: ["latin"],
-  weight: ["300", "400", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
 });
 
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
 export const metadata: Metadata = {
-  title: "Mohan Ruttala | Professional Portfolio",
-  description: "I create beautiful, functional, and user-centered digital experiences that solve real-world problems in Visakhapatnam and beyond.",
+  title: "Mohan Ruttala | Full Stack Engineer & Software Developer",
+  description: "Full Stack Engineer based in Visakhapatnam, India. Specializing in React, Next.js, TypeScript, Node.js, Python, & AI-driven digital experiences.",
+  keywords: ["Mohan Ruttala", "Full Stack Developer", "Visakhapatnam", "React Developer", "Next.js", "Software Engineer", "Web Applications"],
+  authors: [{ name: "Mohan Ruttala" }],
+  icons: {
+    icon: [
+      { url: "/myprofile.jpg", type: "image/jpeg" },
+      { url: "/icon.jpg", type: "image/jpeg" },
+    ],
+    shortcut: "/myprofile.jpg",
+    apple: "/myprofile.jpg",
+  },
 };
 
 export default function RootLayout({
@@ -22,7 +38,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${kanit.variable} dark h-full antialiased`}
+      className={`${kanit.variable} ${jetbrainsMono.variable} dark h-full antialiased`}
+      data-theme="cyan"
     >
       <head>
         <link
@@ -30,7 +47,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#0c0c0c] text-on-surface">
+      <body className="min-h-full flex flex-col bg-[#07080c] text-on-surface selection:bg-cyan-500/30 selection:text-cyan-200">
         {children}
       </body>
     </html>
