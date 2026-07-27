@@ -103,7 +103,7 @@ export const Contact: React.FC<ContactProps> = ({
                 I'm interested in:
               </label>
               <div className="flex flex-wrap gap-2">
-                {["Project Inquiry", "Full-Time Role", "Technical Audit", "General Help"].map((subj) => (
+                {["Full-Time Role / Startup", "Jewelry Store Website", "Freelance Project", "Technical Audit / AI", "General Inquiry"].map((subj) => (
                   <button
                     key={subj}
                     type="button"
