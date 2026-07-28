@@ -114,34 +114,54 @@ export const Hero: React.FC = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-5">
+        <div className="lg:col-span-5 flex flex-col gap-6">
           <figure
             ref={portraitRef}
             className="reveal transition-transform duration-[var(--dur-5)] ease-[var(--ease)] will-change-transform"
             style={{ ["--reveal-delay" as string]: "240ms" }}
           >
-            <div className="lit relative overflow-hidden rounded-xl border border-edge shadow-[var(--shadow-3),var(--lit-top)]">
+            <div className="lit group relative overflow-hidden rounded-xl border border-edge shadow-[var(--shadow-3),var(--lit-top)]">
               <Image
-                src="/myprofile.jpg"
-                alt="Mohan Ruttala"
+                src="/hero_premium_visual.png"
+                alt="Mohan Ruttala - Premium Visual Tech Centerpiece"
                 width={720}
-                height={860}
+                height={540}
                 priority
                 sizes="(max-width: 1024px) 100vw, 40vw"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-[var(--dur-4)] ease-[var(--ease)] group-hover:scale-[1.02]"
               />
-              {/* A single soft key light from above-left, so the portrait sits
-                  in the same lighting as every other surface. */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 bg-[linear-gradient(160deg,rgba(232,217,184,0.10),transparent_45%)]"
+                className="absolute inset-0 bg-gradient-to-t from-ink-0/85 via-ink-0/25 to-transparent"
+              />
+              <div className="absolute inset-x-4 bottom-4 flex items-center justify-between gap-4">
+                <span className="flex items-center gap-2 text-[12px] text-text-hi">
+                  <span className="h-1.5 w-1.5 rounded-full bg-jade" />
+                  Full-stack &amp; e-commerce architecture
+                </span>
+                <span className="t-label">0-to-1</span>
+              </div>
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-[linear-gradient(160deg,rgba(232,217,184,0.12),transparent_45%)]"
               />
             </div>
 
             <figcaption className="mt-4 flex items-center justify-between gap-4">
-              <span className="t-label">Visakhapatnam, IN</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 overflow-hidden rounded-full border border-edge">
+                  <Image
+                    src="/myprofile.jpg"
+                    alt="Mohan Ruttala"
+                    width={32}
+                    height={32}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <span className="t-label">Mohan Ruttala · Visakhapatnam, IN</span>
+              </div>
               <span className="t-mono tabular-nums">
-                {localTime ? `${localTime} local` : " "}
+                {localTime ? `${localTime} IST` : " "}
               </span>
             </figcaption>
           </figure>
