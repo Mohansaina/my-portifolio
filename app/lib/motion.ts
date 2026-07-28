@@ -103,7 +103,9 @@ function getRevealObserver(): IntersectionObserver {
 
 export function useReveal(deps: unknown[] = []) {
   useEffect(() => {
-    const nodes = document.querySelectorAll<HTMLElement>(".reveal:not(.is-in)");
+    const nodes = document.querySelectorAll<HTMLElement>(
+      ".reveal:not(.is-in), .reveal-rows:not(.is-in)",
+    );
     if (nodes.length === 0) return;
 
     if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {

@@ -1,4 +1,5 @@
 import React from "react";
+import { SplitText } from "./SplitText";
 
 /**
  * One section rhythm for the whole page. Every section uses this wrapper, so
@@ -54,9 +55,16 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   lede,
   className = "",
 }) => (
-  <header className={`reveal mb-12 md:mb-16 ${className}`}>
+  <header className={`reveal reveal-split mb-12 md:mb-16 ${className}`}>
     <Eyebrow className="mb-4">{eyebrow}</Eyebrow>
-    <h2 className="t-display-l max-w-[18ch]">{title}</h2>
-    {lede && <p className="t-body-l mt-6">{lede}</p>}
+
+    <h2 className="t-display-l max-w-[18ch]">
+      <SplitText>{title}</SplitText>
+    </h2>
+
+    {/* Draws in after the words have landed. */}
+    <div className="draw-rule mt-8 h-px w-24 bg-lume/40" />
+
+    {lede && <p className="t-body-l mt-8">{lede}</p>}
   </header>
 );

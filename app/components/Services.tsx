@@ -81,7 +81,7 @@ export const Services: React.FC = () => {
             <p className="mt-1 text-[14px] text-lume/90">{service.summary}</p>
             <p className="t-body mt-4 !text-[14px]">{service.body}</p>
 
-            <ul className="mt-6 space-y-2 border-t border-edge pt-6">
+            <ul className="reveal-rows mt-6 space-y-2 border-t border-edge pt-6">
               {service.points.map((point) => (
                 <li
                   key={point}

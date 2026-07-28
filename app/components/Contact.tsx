@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Eyebrow } from "./ui/Section";
+import { SplitText } from "./ui/SplitText";
 import { Icon, IconName } from "./ui/Icon";
 import { useToast } from "./Toast";
 import { useReveal } from "../lib/motion";
@@ -68,8 +69,8 @@ export const Contact: React.FC = () => {
       <div className="mx-auto max-w-wide">
         <Eyebrow className="reveal mb-6">Contact</Eyebrow>
 
-        <h2 className="reveal t-display-l max-w-[16ch]">
-          Tell me what you are building.
+        <h2 className="reveal reveal-split t-display-l max-w-[16ch]">
+          <SplitText>Tell me what you are building.</SplitText>
         </h2>
 
         <p className="reveal t-body-l mt-6">

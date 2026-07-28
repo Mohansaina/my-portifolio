@@ -41,6 +41,13 @@ export const Timeline: React.FC = () => {
       <SectionHeader eyebrow="Experience" title="How I got here." />
 
       <ol className="relative border-l border-edge">
+        {/* Fills as you read down the list. Native scroll-driven animation,
+            so there is no scroll listener and no main-thread work. */}
+        <span
+          aria-hidden
+          className="rail-progress absolute -left-px top-0 h-full w-px bg-lume/50"
+        />
+
         {MILESTONES.map((item, i) => (
           <li
             key={item.period}

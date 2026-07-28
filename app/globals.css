@@ -306,46 +306,153 @@ body {
    canvas, no per-frame cost.
    ============================================================ */
 
+/* ============================================================
+   Background — Premium OS Studio Atmosphere
+   Multi-layered depth: studio wash, ambient mesh, dot grid matrix,
+   edge vignette, and ultra-fine tactile grain.
+   ============================================================ */
+
+.os-background-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--color-ink-0);
+  overflow: hidden;
+}
+
+/* 1. Vignette & Edge Falloff */
+.os-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 120% 120% at 50% 50%,
+    transparent 35%,
+    rgba(5, 6, 7, 0.55) 100%
+  );
+  pointer-events: none;
+}
+
+/* 2. Top-Center Studio & Hero Focal Glow */
+.os-hero-glow {
+  position: absolute;
+  top: -15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140vw;
+  max-width: 1400px;
+  height: 700px;
+  border-radius: 100%;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(232, 217, 184, 0.048) 0%,
+    rgba(148, 163, 184, 0.025) 50%,
+    transparent 100%
+  );
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+/* 3. Slow Drifting Ambient Mesh Blobs */
+.os-ambient-blob-1 {
+  position: absolute;
+  top: 10%;
+  right: -5%;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(148, 163, 184, 0.035) 0%,
+    rgba(38, 41, 48, 0.02) 60%,
+    transparent 100%
+  );
+  filter: blur(120px);
+  animation: os-mesh-drift-1 65s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.os-ambient-blob-2 {
+  position: absolute;
+  bottom: 15%;
+  left: -10%;
+  width: 900px;
+  height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(232, 217, 184, 0.025) 0%,
+    rgba(22, 24, 28, 0.03) 65%,
+    transparent 100%
+  );
+  filter: blur(140px);
+  animation: os-mesh-drift-2 75s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes os-mesh-drift-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-60px, 40px, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-30px, 90px, 0) scale(0.95);
+  }
+}
+
+@keyframes os-mesh-drift-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(70px, -50px, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(40px, -80px, 0) scale(0.97);
+  }
+}
+
+/* 4. Fine Dot Grid Raster Matrix */
+.os-dot-matrix {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.022) 1px,
+    transparent 0
+  );
+  background-size: 48px 48px;
+  mask-image: radial-gradient(
+    ellipse 85% 70% at 50% 35%,
+    #000 30%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 85% 70% at 50% 35%,
+    #000 30%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* 5. Legacy class support for smooth fallback */
 .studio-wash {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(
-      65% 45% at 50% -10%,
-      rgba(232, 217, 184, 0.08) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      45% 40% at 85% 20%,
-      rgba(6, 182, 212, 0.04) 0%,
-      transparent 75%
-    ),
-    radial-gradient(
-      55% 45% at 15% 75%,
-      rgba(245, 158, 11, 0.035) 0%,
-      transparent 80%
-    ),
-    linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.015) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.015) 1px,
-      transparent 1px
-    );
-  background-size: 100% 100%, 100% 100%, 100% 100%, 64px 64px, 64px 64px;
+  background: transparent;
 }
 
+/* 6. Ultra-Light Film Grain Overlay */
 .grain {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.025;
+  opacity: 0.018;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -442,6 +549,154 @@ body {
 }
 
 /* ============================================================
+   MOTION LAYER
+   Everything below is entrance choreography. Two mechanisms only:
+   a class toggled once by the shared IntersectionObserver, and —
+   where a value must track scroll position continuously — native
+   scroll-driven animation, which runs off the main thread.
+   Every effect animates transform / opacity / filter only.
+   ============================================================ */
+
+/* --- Headline reveal ---------------------------------------
+   Words rise out of their own clipping box, one after another.
+   The clip is what makes it read as considered rather than as a
+   fade. Padding + negative margin keeps descenders from being
+   shaved by the overflow. */
+
+.reveal.reveal-split {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.split-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+
+.split-word > span {
+  display: inline-block;
+  transform: translate3d(0, 110%, 0);
+  transition: transform var(--dur-5) var(--ease);
+  transition-delay: calc(var(--i, 0) * 40ms);
+  will-change: transform;
+}
+
+.is-in .split-word > span {
+  transform: translate3d(0, 0, 0);
+}
+
+/* --- Drawing hairline --------------------------------------
+   Section rules draw in from the left instead of appearing. */
+
+.draw-rule {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-5) var(--ease);
+  transition-delay: 160ms;
+}
+
+.is-in .draw-rule,
+.draw-rule.is-in {
+  transform: scaleX(1);
+}
+
+/* --- Row stagger -------------------------------------------
+   Lists animate row by row from one observed parent, rather than
+   every row carrying its own inline delay. */
+
+.reveal-rows > * {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition:
+    opacity var(--dur-4) var(--ease),
+    transform var(--dur-4) var(--ease);
+}
+
+.reveal-rows.is-in > * {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-rows.is-in > *:nth-child(1) { transition-delay: 0ms; }
+.reveal-rows.is-in > *:nth-child(2) { transition-delay: 55ms; }
+.reveal-rows.is-in > *:nth-child(3) { transition-delay: 110ms; }
+.reveal-rows.is-in > *:nth-child(4) { transition-delay: 165ms; }
+.reveal-rows.is-in > *:nth-child(5) { transition-delay: 220ms; }
+.reveal-rows.is-in > *:nth-child(6) { transition-delay: 275ms; }
+.reveal-rows.is-in > *:nth-child(n + 7) { transition-delay: 330ms; }
+
+/* --- Sticky work stack -------------------------------------
+   Each card pins slightly lower than the one before, so scrolling
+   deals them into a deck. Depth comes from the offset and the
+   shadow, not from perspective tricks. */
+
+.stack-item {
+  position: sticky;
+  top: calc(96px + var(--i, 0) * 16px);
+}
+
+/* --- Scroll-linked rail ------------------------------------
+   The experience rail fills as you read down it. Native
+   scroll-driven animation where supported: no scroll listener, no
+   main-thread work, and it degrades to a plain full-height rail
+   everywhere else. */
+
+.rail-progress {
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+@supports (animation-timeline: view()) {
+  .rail-progress {
+    animation: rail-fill linear both;
+    animation-timeline: view();
+    animation-range: entry 30% cover 70%;
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  .rail-progress {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes rail-fill {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* --- Ambient pointer light ---------------------------------
+   A soft champagne light that follows the cursor. The softness is
+   the gradient itself, not a blur filter — so this moves on the
+   compositor and costs nothing per frame. */
+
+.aura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 900px;
+  height: 900px;
+  margin: -450px 0 0 -450px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(232, 217, 184, 0.07) 0%,
+    rgba(232, 217, 184, 0.03) 35%,
+    transparent 68%
+  );
+  will-change: transform;
+}
+
+/* ============================================================
    Reduced motion — the brief requires this and it was absent.
    ============================================================ */
 
@@ -461,14 +716,35 @@ body {
   }
 
   /* Never leave content hidden behind an animation that no
-     longer runs. */
-  .reveal {
+     longer runs. Every entrance state must resolve to "visible". */
+  .reveal,
+  .reveal-rows > * {
     opacity: 1;
     transform: none;
     filter: none;
   }
 
+  .split-word > span {
+    transform: none;
+  }
+
+  .draw-rule,
+  .rail-progress {
+    transform: scaleX(1) scaleY(1);
+  }
+
+  /* Pinning is layout, not motion, so the deck still stacks — it
+     just no longer animates into place. */
   .marquee-track {
     animation: none;
+  }
+
+  .aura {
+    display: none;
+  }
+
+  .os-ambient-blob-1,
+  .os-ambient-blob-2 {
+    animation: none !important;
   }
 }

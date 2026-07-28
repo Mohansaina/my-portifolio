@@ -135,7 +135,10 @@ export const Projects: React.FC = () => {
         title="Things I have shipped."
       />
 
-      <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {/* A deck rather than a grid: each card pins a little lower than the
+          one before, so scrolling deals them out and the section has a
+          shape you feel. */}
+      <ul className="space-y-8">
         {PROJECTS.map((project, i) => (
           <ProjectCard
             key={project.id}
@@ -145,6 +148,10 @@ export const Projects: React.FC = () => {
           />
         ))}
       </ul>
+
+      {/* Spacer so the last card can settle before the next section
+          arrives underneath it. */}
+      <div aria-hidden className="h-24 md:h-40" />
 
       <ProjectModal project={selected} onClose={close} />
     </Section>
@@ -162,47 +169,66 @@ const ProjectCard: React.FC<{
     <li
       ref={ref}
       onPointerMove={onPointerMove}
-      className="reveal lit surface surface-raise group relative overflow-hidden rounded-lg"
-      style={{ ["--reveal-delay" as string]: `${index * 60}ms` }}
+      className="stack-item reveal lit surface group relative overflow-hidden rounded-xl
+        shadow-[var(--shadow-3),var(--lit-top)]"
+      style={{ ["--i" as string]: index }}
     >
-      <div className="relative aspect-[16/10] overflow-hidden border-b border-edge bg-ink-1">
-        <Image
-          src={project.image1}
-          alt=""
-          fill
-          sizes="(max-width: 768px) 100vw, 45vw"
-          className="object-cover transition-transform duration-[var(--dur-5)]
-            ease-[var(--ease)] group-hover:scale-[1.02]"
-        />
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="relative aspect-[16/10] overflow-hidden border-b border-edge bg-ink-1 md:aspect-auto md:min-h-[22rem] md:border-b-0 md:border-r">
+          <Image
+            src={project.image1}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover transition-transform duration-[var(--dur-5)]
+              ease-[var(--ease)] group-hover:scale-[1.02]"
+          />
+        </div>
 
-      <div className="p-6">
-        <p className="t-label mb-3">
-          {project.category} · {project.year}
-        </p>
-        {/* The heading holds the control and stretches an invisible layer over
-            the whole card, so there is one tab stop, the accessible name is
-            the title, and the markup stays valid — a <button> cannot legally
-            wrap headings and paragraphs. */}
-        <h3 className="t-subheading">
-          <button
-            type="button"
-            onClick={onOpen}
-            className="cursor-pointer text-left after:absolute after:inset-0 after:content-['']"
-          >
-            {project.title}
-            <span className="sr-only"> — view case study</span>
-          </button>
-        </h3>
-        <p className="t-body mt-2 !text-[14px]">{project.description}</p>
+        <div className="flex flex-col justify-between p-8 md:p-10">
+          <div>
+            <p className="t-label mb-4">
+              {project.category} · {project.year}
+            </p>
+            {/* The heading holds the control and stretches an invisible layer
+                over the whole card, so there is one tab stop, the accessible
+                name is the title, and the markup stays valid — a <button>
+                cannot legally wrap headings and paragraphs. */}
+            <h3 className="t-heading">
+              <button
+                type="button"
+                onClick={onOpen}
+                className="cursor-pointer text-left after:absolute after:inset-0 after:content-['']"
+              >
+                {project.title}
+                <span className="sr-only"> — view case study</span>
+              </button>
+            </h3>
+            <p className="t-body mt-4">{project.description}</p>
+
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {project.techStack.slice(0, 4).map((tech) => (
+                <li
+                  key={tech}
+                  className="rounded-xs border border-edge px-2.5 py-1 font-mono text-[11px] text-text-lo"
+                >
+                  {tech}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p className="mt-8 inline-flex items-center gap-1.5 text-[13px] text-lume">
+            View case study
+            <Icon name="arrow-right" size={14} />
+          </p>
+        </div>
       </div>
 
       {/* Lifted above the stretched layer so these stay independently
           clickable. */}
-      <div className="relative z-[2] flex items-center justify-between gap-4 border-t border-edge px-6 py-4">
-        <span className="t-mono text-text-lo">
-          {project.techStack.slice(0, 3).join(" · ")}
-        </span>
+      <div className="relative z-[2] flex items-center justify-between gap-4 border-t border-edge px-8 py-4">
+        <span className="t-label">Live · Source</span>
         <span className="flex items-center gap-1">
           <a
             href={project.demoUrl}

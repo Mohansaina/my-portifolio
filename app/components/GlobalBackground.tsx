@@ -1,18 +1,27 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { usePrefersReducedMotion } from "../lib/motion";
 
 /**
- * Ultra-Premium Global Background Engine.
+ * Premium Operating System Global Background Engine.
  *
- * Combines soft studio lighting wash, micro-grid matrix, interactive
- * pointer-following ambient aura, fine film grain, and subtle high-end
- * 3D tech artwork refraction layer that stays constant across all pages.
+ * Architecture & Atmosphere:
+ * 1. Base Graphite/Charcoal Canvas (`#0b0c0e`)
+ * 2. Top-Center Studio & Hero Ambient Glow (Key illumination behind headline)
+ * 3. Low-Opacity Drifting Ambient Mesh Blobs (Slow GPU animated movement)
+ * 4. Fine Dot Raster Matrix (48px spatial grid)
+ * 5. Soft Studio Edge Vignette (Natural falloff)
+ * 6. Subtle Interactive Spotlight (Lerped pointer illumination)
+ * 7. Ultra-Light Tactile Film Grain (1.8% SVG noise layer)
  */
-export const GlobalBackground = () => {
+export const GlobalBackground: React.FC = () => {
   const auraRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
+    if (reducedMotion) return;
+
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let currentX = mouseX;
@@ -25,12 +34,14 @@ export const GlobalBackground = () => {
     };
 
     const render = () => {
-      // Liquid lerp interpolation for weightless cursor light aura
-      currentX += (mouseX - currentX) * 0.05;
-      currentY += (mouseY - currentY) * 0.05;
+      // Fluid lerp damping for weightless, subtle pointer spotlight
+      currentX += (mouseX - currentX) * 0.04;
+      currentY += (mouseY - currentY) * 0.04;
 
       if (auraRef.current) {
-        auraRef.current.style.transform = `translate3d(${currentX - 300}px, ${currentY - 300}px, 0)`;
+        // `.aura` centres itself with a negative margin, so this is the raw
+        // pointer position rather than a corner offset.
+        auraRef.current.style.transform = `translate3d(${currentX.toFixed(1)}px, ${currentY.toFixed(1)}px, 0)`;
       }
 
       animId = requestAnimationFrame(render);
@@ -43,24 +54,33 @@ export const GlobalBackground = () => {
       window.removeEventListener("pointermove", handlePointerMove);
       cancelAnimationFrame(animId);
     };
-  }, []);
+  }, [reducedMotion]);
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 select-none overflow-hidden">
-      {/* Studio Lighting Wash & Micro-Grid Matrix */}
-      <div className="studio-wash" />
+    <div
+      aria-hidden
+      className="os-background-canvas"
+    >
+      {/* 1. Top-Center Studio & Hero Focal Glow */}
+      <div className="os-hero-glow" />
 
-      {/* Interactive Cursor Light Aura */}
-      <div
-        ref={auraRef}
-        className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-r from-cyan-500/10 via-amber-500/5 to-purple-500/10 blur-[120px] opacity-70 transition-opacity duration-500 pointer-events-none"
-        style={{ transform: "translate3d(0, 0, 0)" }}
-      />
+      {/* 2. Slow Drifting Ambient Mesh Layer */}
+      <div className="os-ambient-blob-1" />
+      <div className="os-ambient-blob-2" />
 
-      {/* Luxury 3D Tech Visual Artwork Layer */}
-      <div className="absolute inset-0 opacity-[0.11] bg-[url('/hero_premium_visual.png')] bg-cover bg-center mix-blend-screen blur-[10px] scale-105 pointer-events-none" />
+      {/* 3. Fine Raster Dot Matrix Layer */}
+      <div className="os-dot-matrix" />
 
-      {/* Fine Film Grain Texture */}
+      {/* 4. Studio Edge Vignette */}
+      <div className="os-vignette" />
+
+      {/* 5. Subtle Interactive Pointer Spotlight
+             No blur() filter: a radial gradient is already soft, and an
+             element that both moves and blurs has to be re-rasterised every
+             frame. Transform-only keeps this on the compositor. */}
+      {!reducedMotion && <div ref={auraRef} className="aura" />}
+
+      {/* 6. Ultra-Fine Film Grain Overlay */}
       <div className="grain" />
     </div>
   );

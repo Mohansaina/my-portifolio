@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ButtonLink } from "./ui/Button";
+import { SplitText } from "./ui/SplitText";
 import { usePrefersReducedMotion } from "../lib/motion";
 
 /**
@@ -80,11 +81,8 @@ export const Hero: React.FC = () => {
             <span className="t-label !text-text-mid">Available for work</span>
           </p>
 
-          <h1
-            className="reveal t-display-xl text-balance"
-            style={{ ["--reveal-delay" as string]: "60ms" }}
-          >
-            I build the whole product.
+          <h1 className="reveal reveal-split t-display-xl text-balance">
+            <SplitText>I build the whole product.</SplitText>
           </h1>
 
           <p

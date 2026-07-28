@@ -83,7 +83,7 @@ export const Skills: React.FC = () => {
               </span>
             </dt>
             <dd>
-              <ul>
+              <ul className="reveal-rows">
                 {group.items.map((item) => (
                   <li
                     key={item}
