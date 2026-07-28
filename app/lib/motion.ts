@@ -78,18 +78,32 @@ export function usePointerLight<T extends HTMLElement>() {
 }
 
 /**
- * Reveals `.reveal` elements once as they enter the viewport.
+ * One IntersectionObserver for the entire page, shared by every caller.
  *
- * One observer for the whole page. Elements are re-collected whenever `deps`
- * change, so content mounted later (filtered lists, tab panels) still gets
- * picked up — the previous implementation only ever observed what existed on
- * first mount.
+ * Sections each call `useReveal()`, and content that mounts later (tab panels,
+ * filtered lists) re-registers via `deps` — but they all feed the same
+ * observer rather than each standing up its own.
  */
+let revealObserver: IntersectionObserver | null = null;
+
+function getRevealObserver(): IntersectionObserver {
+  revealObserver ??= new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-in");
+        // Reveal once. Nothing re-hides on the way back up.
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
+  );
+  return revealObserver;
+}
+
 export function useReveal(deps: unknown[] = []) {
   useEffect(() => {
-    const nodes = Array.from(
-      document.querySelectorAll<HTMLElement>(".reveal:not(.is-in)"),
-    );
+    const nodes = document.querySelectorAll<HTMLElement>(".reveal:not(.is-in)");
     if (nodes.length === 0) return;
 
     if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
@@ -97,19 +111,10 @@ export function useReveal(deps: unknown[] = []) {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-in");
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
-    );
-
+    const observer = getRevealObserver();
     nodes.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    // Intentionally no teardown: the observer lives for the page, and
+    // unobserving here would undo registrations made by other sections.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }

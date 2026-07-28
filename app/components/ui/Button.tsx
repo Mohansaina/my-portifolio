@@ -19,7 +19,7 @@ const BASE =
 const VARIANTS: Record<Variant, string> = {
   // The one place the specular colour is used as a fill.
   primary:
-    "bg-lume text-ink-0 shadow-[var(--shadow-1)] hover:bg-[#f2e6cb] hover:shadow-[var(--shadow-2)]",
+    "bg-lume text-ink-0 shadow-[var(--shadow-1)] hover:bg-lume-hi hover:shadow-[var(--shadow-2)]",
   secondary:
     "bg-ink-2 text-text-hi border border-edge shadow-[var(--lit-top)] " +
     "hover:bg-ink-3 hover:border-edge-hi",

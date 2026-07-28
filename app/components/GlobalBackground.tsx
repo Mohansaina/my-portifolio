@@ -1,18 +1,16 @@
+import React from "react";
+
 /**
- * The page's ambient lighting.
+ * The page's ambient lighting & global visual artwork background.
  *
- * Pure CSS: a soft studio wash from a key light above, and a trace of film
- * grain so no area of the page is ever perfectly flat. This replaces two
- * simultaneous requestAnimationFrame canvases that were each running O(n²)
- * neighbour checks every frame — roughly 5,500 distance calculations and
- * thousands of stroke() calls per frame, for an effect the eye read as
- * texture. Texture is cheaper as texture.
- *
- * No client boundary: there is nothing here to hydrate.
+ * Combines soft studio lighting wash, fine film grain, and subtle
+ * global tech visual artwork overlay that flows across the entire website.
  */
 export const GlobalBackground = () => (
-  <div aria-hidden className="pointer-events-none fixed inset-0 z-0 select-none">
+  <div aria-hidden className="pointer-events-none fixed inset-0 z-0 select-none overflow-hidden">
     <div className="studio-wash" />
+    {/* Global Tech Visual Overlay across the entire site */}
+    <div className="absolute inset-0 opacity-[0.09] bg-[url('/hero_premium_visual.png')] bg-cover bg-center mix-blend-screen blur-[12px] scale-105 pointer-events-none" />
     <div className="grain" />
   </div>
 );

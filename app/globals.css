@@ -21,6 +21,7 @@
 
   /* --- Specular (the only warmth) ------------------------- */
   --color-lume: #e8d9b8;
+  --color-lume-hi: #f2e6cb;
   --color-lume-dim: rgba(232, 217, 184, 0.55);
 
   /* --- Text (contrast-checked against --color-ink-0) ------ */

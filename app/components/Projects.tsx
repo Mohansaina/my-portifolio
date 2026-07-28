@@ -162,39 +162,44 @@ const ProjectCard: React.FC<{
     <li
       ref={ref}
       onPointerMove={onPointerMove}
-      className="reveal lit surface surface-raise group overflow-hidden rounded-lg"
+      className="reveal lit surface surface-raise group relative overflow-hidden rounded-lg"
       style={{ ["--reveal-delay" as string]: `${index * 60}ms` }}
     >
-      {/* One button covers the whole card, so there is a single tab stop and
-          the entire surface is the target. The external links sit outside it
-          in the footer row. */}
-      <button
-        type="button"
-        onClick={onOpen}
-        className="block w-full cursor-pointer text-left"
-        aria-label={`${project.title} — view case study`}
-      >
-        <div className="relative aspect-[16/10] overflow-hidden border-b border-edge bg-ink-1">
-          <Image
-            src={project.image1}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 45vw"
-            className="object-cover transition-transform duration-[var(--dur-5)]
-              ease-[var(--ease)] group-hover:scale-[1.02]"
-          />
-        </div>
+      <div className="relative aspect-[16/10] overflow-hidden border-b border-edge bg-ink-1">
+        <Image
+          src={project.image1}
+          alt=""
+          fill
+          sizes="(max-width: 768px) 100vw, 45vw"
+          className="object-cover transition-transform duration-[var(--dur-5)]
+            ease-[var(--ease)] group-hover:scale-[1.02]"
+        />
+      </div>
 
-        <div className="p-6">
-          <p className="t-label mb-3">
-            {project.category} · {project.year}
-          </p>
-          <h3 className="t-subheading">{project.title}</h3>
-          <p className="t-body mt-2 !text-[14px]">{project.description}</p>
-        </div>
-      </button>
+      <div className="p-6">
+        <p className="t-label mb-3">
+          {project.category} · {project.year}
+        </p>
+        {/* The heading holds the control and stretches an invisible layer over
+            the whole card, so there is one tab stop, the accessible name is
+            the title, and the markup stays valid — a <button> cannot legally
+            wrap headings and paragraphs. */}
+        <h3 className="t-subheading">
+          <button
+            type="button"
+            onClick={onOpen}
+            className="cursor-pointer text-left after:absolute after:inset-0 after:content-['']"
+          >
+            {project.title}
+            <span className="sr-only"> — view case study</span>
+          </button>
+        </h3>
+        <p className="t-body mt-2 !text-[14px]">{project.description}</p>
+      </div>
 
-      <div className="flex items-center justify-between gap-4 border-t border-edge px-6 py-4">
+      {/* Lifted above the stretched layer so these stay independently
+          clickable. */}
+      <div className="relative z-[2] flex items-center justify-between gap-4 border-t border-edge px-6 py-4">
         <span className="t-mono text-text-lo">
           {project.techStack.slice(0, 3).join(" · ")}
         </span>

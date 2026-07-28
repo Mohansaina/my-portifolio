@@ -30,25 +30,33 @@ const STACK = [
   "OpenAI",
 ];
 
+/* Doubled so a single track is always wider than the viewport — otherwise the
+   loop shows a gap on very wide screens. */
+const ROW = [...STACK, ...STACK];
+
 const Row = () => (
   <div className="flex shrink-0 items-center">
-    {STACK.map((item) => (
-      <span key={item} className="flex items-center whitespace-nowrap">
+    {ROW.map((item, i) => (
+      <span key={`${item}-${i}`} className="flex items-center whitespace-nowrap">
         <span className="t-mono px-6 !text-[13px] text-text-lo">{item}</span>
-        <span aria-hidden className="h-1 w-1 rounded-full bg-edge-hi" />
+        <span className="h-1 w-1 rounded-full bg-edge-hi" />
       </span>
     ))}
   </div>
 );
 
+/**
+ * Decorative: the Stack section lists all of this properly and in a readable
+ * order, so this is hidden from assistive technology rather than read out as
+ * twenty-eight duplicated list items.
+ */
 export const Marquee: React.FC = () => (
-  <div className="relative border-y border-edge py-5">
-    <h2 className="sr-only">Technologies</h2>
+  <div aria-hidden className="relative border-y border-edge py-5 select-none">
     <div className="marquee">
       <div className="marquee-track">
         <Row />
       </div>
-      <div className="marquee-track" aria-hidden>
+      <div className="marquee-track">
         <Row />
       </div>
     </div>
