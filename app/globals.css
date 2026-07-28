@@ -77,6 +77,13 @@
   --dur-5: 500ms; /* ambient only */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* Tailwind's own default easing is cubic-bezier(.4, 0, .2, 1), which
+     otherwise leaks into every `transition-*` utility and leaves the page
+     running two different curves. Overridden here rather than in @theme so
+     it reliably wins the cascade. */
+  --default-transition-timing-function: var(--ease);
+  --default-transition-duration: var(--dur-2);
+
   /* Section rhythm — one value, used by every section */
   --section-y: 128px;
 
