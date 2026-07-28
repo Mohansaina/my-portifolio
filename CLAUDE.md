@@ -5,66 +5,90 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev     # Turbopack dev server on http://localhost:3000
-npm run build   # Production build
-npm start       # Serve the production build
-npm run lint    # ESLint (flat config, eslint-config-next core-web-vitals + typescript)
-npx tsc --noEmit  # Type check (no build script does this on its own)
+npm run dev       # Turbopack dev server on http://localhost:3000
+npm run build     # Production build
+npm start         # Serve the production build
+npm run lint      # ESLint (flat config, eslint-config-next core-web-vitals + typescript)
+npx tsc --noEmit  # Type check — no script does this on its own
 ```
 
-There is no test setup in this repo — no test runner, no test files.
+No test setup exists — no runner, no test files.
+
+`npm ci` currently fails (the lockfile is missing `source-map-js`); use `npm install`.
+
+## The brief comes first
+
+[VISUAL.md](VISUAL.md) is the design specification and it overrides taste. Read it before any visual change. The parts most often violated:
+
+- **Motion** 120/180/240/320/500ms only, easing `cubic-bezier(0.16, 1, 0.3, 1)`, **max hover scale 1.02**, no bounce/elastic/overshoot.
+- **Colour** mostly neutral, no saturated gradients, no rainbow, no neon. The page must still read with all colour removed.
+- **Animate only** `transform` / `opacity` / `filter`. Never animate layout.
+- Every animation respects `prefers-reduced-motion`; focus indicators are always visible.
 
 ## Architecture
 
-Single-page portfolio site for Mohan Ruttala. Next.js 16 App Router + React 19 + Tailwind CSS v4, TypeScript strict mode. No backend, no API routes, no database, no data fetching — **all content is hardcoded as arrays/objects inside the components that render it.**
+Single-page portfolio for Mohan Ruttala. Next.js 16 App Router + React 19 + Tailwind CSS v4, TypeScript strict. No backend, no API routes, no data fetching — content is hardcoded in the component that renders it.
 
-### Everything is a client component
+### Server by default
 
-[app/layout.tsx](app/layout.tsx) is the only server component. [app/page.tsx](app/page.tsx) is `"use client"` and composes every section in fixed order (`Hero → Terminal → Marquee → About → Timeline → Skills → Services → Projects → CodePlayground → Testimonials → Contact`). All components live flat in [app/components/](app/components/) and export a named `const` (not a default export).
+[app/page.tsx](app/page.tsx) and [app/layout.tsx](app/layout.tsx) are **server components**. Only sections needing browser APIs carry `"use client"`. Components live flat in [app/components/](app/components/), reusable primitives in [app/components/ui/](app/components/ui/), and every one exports a named `const` (no default exports).
 
-### Cross-cutting state flows through page.tsx
+### Identity lives in one file
 
-- **Toasts**: `page.tsx` owns the `toasts` array and passes `addToast` down as `onShowToast` props. Any component that needs a toast takes that prop — there is no toast context.
-- **Magnetic button helpers**: `handleMagnetButton` / `handleMagnetButtonReset` are defined in `page.tsx` and passed to `Hero` and `Contact` as `onMagnetButton`/`onMagnetButtonReset`. They mutate `style.transform` directly on the event target.
-- **Audio**: [AudioContext.tsx](app/components/AudioContext.tsx) is the one real React context. `useAudio()` gives `playBeep(freq, type, duration)` which synthesizes tones via Web Audio (no audio files); muted by default and gated on `isMuted`. `Navbar` toggles it.
+[app/lib/site.ts](app/lib/site.ts) holds name, role, email, location, socials and the section list. Metadata, JSON-LD, sitemap, robots, nav, contact section and command palette all read from it. **Never hardcode the email or a social URL** — that duplication is exactly what this file replaced.
 
-### Theming: two independent layers
+### Two theming layers
 
-1. **Material-style design tokens** — defined in the Tailwind v4 `@theme` block in [app/globals.css](app/globals.css) (`--color-surface-container`, `--color-on-surface`, `--spacing-section-gap`, `--font-display-lg`, etc.). These generate Tailwind utilities like `text-on-surface`, `px-margin-desktop`, `py-section-gap`, `max-w-container-max`, `font-label-caps`. Prefer these over raw values for spacing/typography.
-2. **Runtime accent color** — five palettes (`cyan`, `emerald`, `violet`, `amber`, `crimson`) selected by a `data-theme` attribute on `<html>`, each redefining `--accent-color`, `--accent-gradient`, `--accent-glow`, `--accent-border`. [ThemeSwitcher.tsx](app/components/ThemeSwitcher.tsx) sets the attribute and persists to `localStorage` under `mohan_theme`. Consume via the `.accent-text` / `.accent-bg` / `.accent-border` / `.accent-gradient-text` / `.ignition-gradient` helper classes, **not** hardcoded hex.
+1. **Tokens** — the Tailwind v4 `@theme` block in [app/globals.css](app/globals.css) generates `bg-ink-0`…`bg-ink-3`, `text-text-hi/mid/lo`, `border-edge`, `bg-lume`, `text-jade`, plus the radius scale (`rounded-xs` 4 → `rounded-xl` 24) and `max-w-narrow` / `max-w-wide`.
+2. **Non-utility tokens** in `:root` — `--shadow-1/2/3`, `--lit-top`, `--dur-1`…`--dur-5`, `--ease`, `--section-y`.
 
-Caveat: a lot of existing markup hardcodes `cyan-400`/`#00f2fe` (cursor, scroll bar, project buttons) and so ignores the theme switcher. Use accent classes for new work.
+Spacing stays on Tailwind's 4px scale; the 8px grid is held by only using **even** steps. `--default-transition-timing-function` is overridden in `:root` so Tailwind's easing does not leak into `transition-*` utilities.
 
-### Animation is CSS-class + IntersectionObserver, not a library
+Text colours are contrast-checked: `--color-text-lo` is `#7a8088` specifically to clear 4.5:1 on `--color-ink-0`. Do not darken it.
 
-There is no Framer Motion / GSAP. [ScrollAnimations.tsx](app/components/ScrollAnimations.tsx) mounts one global `IntersectionObserver` that adds `is-visible` to any element with `.reveal-up`, `.reveal-scale`, `.reveal-left`, `.reveal-right`, or `.reveal-stagger`. The transitions themselves live in [globals.css](app/globals.css). To animate something new, add one of those classes — the observer picks it up on mount only, so elements rendered later (e.g. inside a modal) will not be observed.
+### The lighting model is the signature
 
-Other effects: `.glass-card` / `.glass-nav` (glassmorphism), `.tilt-card-container` + inline `rotateX/rotateY` math for 3D card tilt, `.marquee-track` keyframes, `.developer-grid` background. Shared easing across the site is `cubic-bezier(0.16, 1, 0.3, 1)`.
+One light source governs everything. `.lit` draws a 1px gradient border-mask that brightens where the pointer is; `usePointerLight()` in [app/lib/motion.ts](app/lib/motion.ts) publishes `--lx`/`--ly` on the element, coalesced into one rAF. `--lit-top` puts a highlight on the upper edge of every raised surface so the whole page shares one light direction.
 
-### Canvas / cursor layers
+**Nothing else glows.** No neon shadows, no per-component accent colours.
 
-[GlobalBackground.tsx](app/components/GlobalBackground.tsx) is a fixed full-viewport `z-0` layer (particle network canvas + blurred orbs + grid mask) mounted once in `page.tsx`; [ParticleCanvas.tsx](app/components/ParticleCanvas.tsx) is a separate, Hero-local canvas. [CustomCursor.tsx](app/components/CustomCursor.tsx) replaces the pointer on `md+` with a dot plus a lerped trailing ring. All three run `requestAnimationFrame` loops with cleanup in `useEffect`.
+### Motion
 
-Sections stack above the background with explicit z-indexes (`z-20`/`z-30`/`z-40`); Navbar, cursor, toasts and modals sit at `z-50`. Keep new fixed overlays inside that scale.
+All hooks live in [app/lib/motion.ts](app/lib/motion.ts):
 
-### Navigation
+- `useReveal(deps?)` — registers `.reveal` / `.reveal-rows` elements with **one module-level IntersectionObserver** shared page-wide. Reveals once, never unobserves on unmount. Pass `deps` for content that mounts later (tab panels).
+- `usePointerLight()`, `useCountUp()`, `usePrefersReducedMotion()`, `useIsMac()` — the last two use `useSyncExternalStore`, not state-in-an-effect (the lint rule `react-hooks/set-state-in-effect` will reject that).
+- `useModal(open, onClose)` — Esc, focus trap, focus restore, scroll lock. Every dialog uses it.
 
-Nav links in [Navbar.tsx](app/components/Navbar.tsx) are plain hash anchors. Adding a nav entry means also giving the target section a matching `id`. Current ids: `about`, `skills`, `timeline`, `services`, `projects`, `playground`, `contact`. `html { scroll-padding-top: 90px }` compensates for the fixed navbar.
+CSS classes: `.reveal` (opacity + translateY + blur), `.reveal-rows` (row stagger from one parent), `.reveal-split` + `<SplitText>` (words rise out of clipping boxes), `.draw-rule`, `.stack-item` (sticky deck), `.rail-progress` (scroll-driven via `animation-timeline: view()`).
+
+Anything new must resolve to a **visible static state** inside the `prefers-reduced-motion` block, or the content becomes invisible for those users.
+
+### No icon font, no animation library
+
+Icons are inline SVG in [app/components/ui/Icon.tsx](app/components/ui/Icon.tsx) — add a path to `PATHS` and the name to `IconName`. There is no Material Symbols stylesheet and no Framer Motion / GSAP.
+
+### Layering
+
+`GlobalBackground` is a fixed `z-0` CSS-only stack. Content is `z-10`, navbar `z-50`, cursor `z-[70]`, modals `z-[75]`, palette `z-[80]`. **Never add a `requestAnimationFrame` canvas** — two of them were removed for costing ~5,500 `Math.hypot` calls per frame.
+
+Never combine `filter: blur()` with a per-frame `transform` — the element re-rasterises every frame. A radial gradient is already soft and needs no blur.
 
 ## Content locations
 
-Editing site content means editing the data literal at the top of the relevant component, not a CMS or JSON file:
+- **Projects**: `PROJECTS` in [Projects.tsx](app/components/Projects.tsx); `ProjectData` type in [ProjectModal.tsx](app/components/ProjectModal.tsx). Screenshots are PNGs in [public/](public/) rendered through `next/image`.
+- **Services / Skills / Timeline / Testimonials**: the array at the top of each component.
+- **Code samples**: `SNIPPETS` in [CodePlayground.tsx](app/components/CodePlayground.tsx).
+- **Everything identity-related**: [app/lib/site.ts](app/lib/site.ts).
 
-- Projects (with `problem`/`solution`/`features`/`techStack`/screenshots): `projects` array in [Projects.tsx](app/components/Projects.tsx); the `ProjectData` type lives in [ProjectModal.tsx](app/components/ProjectModal.tsx). Screenshots are PNGs in [public/](public/) referenced by absolute path via plain `<img>` (`next/image` is not used).
-- Fake-terminal commands (`help`, `whoami`, `skills`, `projects`, `contact`, `matrix`, `clear`): the if/else chain in [Terminal.tsx](app/components/Terminal.tsx).
-- Code snippets shown in the playground: `snippets` array in [CodePlayground.tsx](app/components/CodePlayground.tsx).
-- Bio/contact/social URLs are duplicated across [Contact.tsx](app/components/Contact.tsx), `Terminal.tsx`'s `contact` command, and the `metadata` in [layout.tsx](app/layout.tsx) — update all of them together.
+Section ids (`work`, `services`, `about`, `experience`, `skills`, `code`, `contact`) are declared in `site.sections` and consumed by the nav, scroll-spy, palette and sitemap. Adding a section means adding it there **and** giving the element a matching `id`.
 
-The contact form in `Contact.tsx` does **not** submit anywhere; it fakes success with a `setTimeout` and a toast.
+## Deployment
 
-## Conventions worth matching
+`NEXT_PUBLIC_SITE_URL` **must** be set in production. Canonical URL, OG image URL, sitemap and robots all resolve against it; the fallback in `site.ts` is a guess.
 
-- Material Symbols Outlined icons via `<span className="material-symbols-outlined">icon_name</span>` — loaded from a Google Fonts `<link>` in `layout.tsx`, not an icon package.
-- Fonts are `next/font/google` (Kanit for display/body, JetBrains Mono for code) exposed as `--font-kanit` / `--font-jetbrains`.
-- Dark theme only; base background `#07080c` is repeated on `html`, `body`, and most sections.
-- `@/*` maps to the repo root in [tsconfig.json](tsconfig.json), but components currently use relative imports (`./components/...`).
+## Known open items
+
+- Testimonials in [Testimonials.tsx](app/components/Testimonials.tsx) are three named people. If they are not real quotes, they work against the page's credibility.
+- The About stats claim "15+ projects" and "10+ clients" while four projects are shown.
+- `hero_premium_visual.png` is 731 KB.
