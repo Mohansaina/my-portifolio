@@ -2,6 +2,7 @@ import { ToastProvider } from "./components/Toast";
 import { GlobalBackground } from "./components/GlobalBackground";
 import { ScrollAnimations } from "./components/ScrollAnimations";
 import { CustomCursor } from "./components/CustomCursor";
+import { CommandPalette } from "./components/CommandPalette";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { Marquee } from "./components/Marquee";
@@ -28,6 +29,7 @@ export default function Home() {
       <GlobalBackground />
       <ScrollAnimations />
       <CustomCursor />
+      <CommandPalette />
       <Navbar />
 
       <main className="relative z-10">

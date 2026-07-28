@@ -4,14 +4,16 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "./ui/Icon";
 import { Button, ButtonLink } from "./ui/Button";
 import { useModal } from "../lib/motion";
+import { site } from "../lib/site";
 
-const LINKS = [
-  { label: "Work", href: "#work" },
-  { label: "Services", href: "#services" },
-  { label: "About", href: "#about" },
-  { label: "Experience", href: "#experience" },
-  { label: "Contact", href: "#contact" },
-] as const;
+/* A compact subset of site.sections — the nav stays short, and the command
+   palette covers everything else. */
+const NAV_IDS = ["work", "services", "about", "experience", "contact"];
+
+const LINKS = NAV_IDS.map((id) => {
+  const section = site.sections.find((s) => s.id === id);
+  return { label: section?.label ?? id, href: `#${id}` };
+});
 
 export const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);

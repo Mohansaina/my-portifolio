@@ -4,33 +4,11 @@ import React, { useState } from "react";
 import { Eyebrow } from "./ui/Section";
 import { SplitText } from "./ui/SplitText";
 import { Icon, IconName } from "./ui/Icon";
+import { site } from "../lib/site";
 import { useToast } from "./Toast";
 import { useReveal } from "../lib/motion";
 
-const EMAIL = "ruttalamohan23@gmail.com";
-
-const SOCIALS: { label: string; href: string; icon: IconName }[] = [
-  {
-    label: "GitHub",
-    href: "https://github.com/Mohansaina",
-    icon: "github",
-  },
-  {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/in/mohan-sai-ruttala-a73484309/",
-    icon: "linkedin",
-  },
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/mohan_23_03_/",
-    icon: "instagram",
-  },
-  {
-    label: "X",
-    href: "https://x.com/MohanRutta17691",
-    icon: "x",
-  },
-];
+const EMAIL = site.email;
 
 /**
  * The contact form is gone.
@@ -101,7 +79,7 @@ export const Contact: React.FC = () => {
         </div>
 
         <ul className="reveal mt-8 flex flex-wrap gap-x-8 gap-y-3">
-          {SOCIALS.map((social) => (
+          {site.socials.map((social) => (
             <li key={social.label}>
               <a
                 href={social.href}
@@ -110,7 +88,7 @@ export const Contact: React.FC = () => {
                 className="inline-flex items-center gap-2 rounded-xs text-[14px] text-text-lo
                   transition-colors duration-[var(--dur-2)] hover:text-text-hi"
               >
-                <Icon name={social.icon} size={15} />
+                <Icon name={social.icon as IconName} size={15} />
                 {social.label}
                 <Icon name="arrow-up-right" size={12} />
               </a>

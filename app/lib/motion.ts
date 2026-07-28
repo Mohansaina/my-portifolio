@@ -31,6 +31,30 @@ export function usePrefersReducedMotion(): boolean {
   );
 }
 
+const noopSubscribe = () => () => {};
+
+/**
+ * Whether the platform uses ⌘ rather than Ctrl, for rendering shortcut hints.
+ *
+ * A non-reactive external value, so it goes through `useSyncExternalStore`
+ * with a server snapshot of `false` — that keeps hydration matching and avoids
+ * setting state from an effect.
+ */
+export function useIsMac(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => {
+      const platform =
+        (navigator as Navigator & { userAgentData?: { platform?: string } })
+          .userAgentData?.platform ??
+        navigator.platform ??
+        "";
+      return /mac|iphone|ipad/i.test(platform);
+    },
+    () => false,
+  );
+}
+
 /**
  * The signature interaction: light raking across an edge.
  *
