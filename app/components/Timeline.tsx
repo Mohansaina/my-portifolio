@@ -1,87 +1,75 @@
 "use client";
 
 import React from "react";
-import { ScrambleText } from "./ScrambleText";
+import { Section, SectionHeader } from "./ui/Section";
+import { useReveal } from "../lib/motion";
+
+/**
+ * The one section where sequence is real information, so it is the one
+ * section that keeps an explicit ordering device — a hairline rail and mono
+ * years, rather than the glowing dots it had before.
+ */
+const MILESTONES = [
+  {
+    period: "2024 — now",
+    role: "Independent full-stack engineer",
+    context: "Freelance & contract",
+    body: "Building AI reputation dashboards, camera OCR tools and weather utilities. Working directly with business owners to audit, design and deploy web applications.",
+    tags: ["Next.js", "TypeScript", "Node.js", "PostgreSQL"],
+  },
+  {
+    period: "2023 — 2024",
+    role: "Frontend & web utility engineer",
+    context: "Product engineering",
+    body: "Real-time weather alerting for drying schedules, and dosage calculators driven by OCR of agricultural labels. Focused on responsive PWAs, small bundles and offline caching.",
+    tags: ["React", "Tailwind CSS", "REST APIs", "PWA"],
+  },
+  {
+    period: "2022 — 2023",
+    role: "Full-stack developer",
+    context: "Technical foundations",
+    body: "Computer science and full-stack project work in Visakhapatnam. Relational schema design, SQL normalisation, backend security and asynchronous event loops.",
+    tags: ["JavaScript", "Express.js", "PostgreSQL", "Data structures"],
+  },
+];
 
 export const Timeline: React.FC = () => {
-  const milestones = [
-    {
-      year: "2024 - PRESENT",
-      title: "Senior Full Stack Freelance Developer",
-      role: "Independent Software Consultant",
-      description:
-        "Building AI reputation dashboards (businesshelp), custom mobile OCR web apps (AgriScan), and weather tracking utilities. Partnering with business owners globally to audit, design, and deploy web applications.",
-      tags: ["Next.js", "TypeScript", "Node.js", "AI Integration", "PostgreSQL"],
-    },
-    {
-      year: "2023 - 2024",
-      title: "Lead Frontend & Web Utility Engineer",
-      role: "Product Engineering",
-      description:
-        "Engineered real-time weather alert utilities for clothes drying schedules and smart dosage calculators for agricultural OCR scans. Focused on responsive PWAs, optimized bundle sizes, and seamless offline caching.",
-      tags: ["React", "Tailwind CSS", "REST APIs", "PWA", "Python Automation"],
-    },
-    {
-      year: "2022 - 2023",
-      title: "Full Stack Developer & Systems Student",
-      role: "Technical Foundations",
-      description:
-        "Completed intensive computer science and full-stack software development projects in Visakhapatnam. Mastered relational database design, SQL normalizations, backend security headers, and asynchronous event loops.",
-      tags: ["JavaScript", "Express.js", "PostgreSQL", "Git Workflows", "Data Structures"],
-    },
-  ];
+  useReveal();
 
   return (
-    <section id="timeline" className="py-section-gap px-margin-mobile md:px-margin-desktop bg-[#08090e] border-t border-white/5">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-16 text-center md:text-left">
-          <span className="font-label-caps text-xs accent-text uppercase tracking-[0.2em] block mb-2">
-            EXPERIENCE & MILESTONES
-          </span>
-          <h2 className="hero-heading font-display-lg text-4xl md:text-5xl uppercase cursor-default">
-            <ScrambleText text="Career Journey" />
-          </h2>
-        </div>
+    <Section id="experience" className="border-t border-edge">
+      <SectionHeader eyebrow="Experience" title="How I got here." />
 
-        <div className="relative border-l border-white/10 ml-4 md:ml-6 space-y-12 pl-6 md:pl-10">
-          {milestones.map((item, idx) => (
-            <div key={idx} className="relative group">
-              {/* Timeline Indicator Dot */}
-              <div className="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-[#12141c] border-2 border-cyan-400 group-hover:bg-cyan-400 group-hover:scale-125 transition-all shadow-[0_0_12px_var(--accent-glow)]" />
+      <ol className="relative border-l border-edge">
+        {MILESTONES.map((item, i) => (
+          <li
+            key={item.period}
+            className="reveal relative pb-12 pl-8 last:pb-0 md:pl-12"
+            style={{ ["--reveal-delay" as string]: `${i * 60}ms` }}
+          >
+            <span
+              aria-hidden
+              className="absolute -left-px top-2.5 h-px w-5 bg-edge-hi md:w-8"
+            />
 
-              <div className="glass-card p-6 md:p-8 rounded-3xl group-hover:border-cyan-500/30 transition-all duration-300">
-                <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
-                  <span className="font-code text-xs accent-text font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20">
-                    {item.year}
-                  </span>
-                  <span className="font-label-caps text-xs text-on-surface-variant/60 uppercase">
-                    {item.role}
-                  </span>
-                </div>
+            <p className="t-mono mb-3 text-text-lo">{item.period}</p>
+            <h3 className="t-subheading">{item.role}</h3>
+            <p className="t-label mt-1.5">{item.context}</p>
+            <p className="t-body mt-4 !text-[14px]">{item.body}</p>
 
-                <h3 className="font-display-lg text-xl md:text-2xl text-white uppercase font-bold mb-3">
-                  {item.title}
-                </h3>
-
-                <p className="font-body-md text-sm text-on-surface-variant/85 leading-relaxed mb-6">
-                  {item.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-                  {item.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[10px] font-label-caps tracking-wider px-3 py-1 rounded-full bg-white/5 border border-white/10 text-on-surface-variant/80"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+            <ul className="mt-5 flex flex-wrap gap-2">
+              {item.tags.map((tag) => (
+                <li
+                  key={tag}
+                  className="rounded-xs border border-edge px-2.5 py-1 font-mono text-[11px] text-text-lo"
+                >
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+    </Section>
   );
 };

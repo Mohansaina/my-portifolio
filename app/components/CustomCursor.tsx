@@ -2,69 +2,100 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
+/**
+ * A dot at the pointer and a ring that trails it.
+ *
+ * Deliberately quiet: champagne at low opacity rather than a neon glow, and
+ * it augments the system cursor instead of replacing it, so nobody loses
+ * track of where they are pointing.
+ *
+ * Suppressed entirely for coarse pointers and for reduced-motion users. Both
+ * elements are positioned from inside one rAF loop, so the component renders
+ * once and then never re-renders while the pointer moves.
+ */
 export const CustomCursor: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [enabled, setEnabled] = useState(false);
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let mouseX = -100;
-    let mouseY = -100;
+    const fine = window.matchMedia("(pointer: fine)");
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const sync = () => setEnabled(fine.matches && !calm.matches);
+    sync();
+
+    fine.addEventListener("change", sync);
+    calm.addEventListener("change", sync);
+    return () => {
+      fine.removeEventListener("change", sync);
+      calm.removeEventListener("change", sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    let x = -100;
+    let y = -100;
     let ringX = -100;
     let ringY = -100;
-    let animId: number;
+    let frame: number;
+    let seen = false;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (!isVisible) setIsVisible(true);
-
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+    const onMove = (e: PointerEvent) => {
+      x = e.clientX;
+      y = e.clientY;
+      if (!seen) {
+        seen = true;
+        ringX = x;
+        ringY = y;
+        if (dotRef.current) dotRef.current.style.opacity = "1";
+        if (ringRef.current) ringRef.current.style.opacity = "1";
       }
     };
 
-    const handleMouseLeave = () => {
-      setIsVisible(false);
+    const hide = () => {
+      if (dotRef.current) dotRef.current.style.opacity = "0";
+      if (ringRef.current) ringRef.current.style.opacity = "0";
     };
 
     const render = () => {
-      // Smooth liquid lerp curve for trailing ring
-      ringX += (mouseX - ringX) * 0.14;
-      ringY += (mouseY - ringY) * 0.14;
+      // Light damping. Enough to read as weight, not enough to lag.
+      ringX += (x - ringX) * 0.16;
+      ringY += (y - ringY) * 0.16;
 
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ringX - 18}px, ${ringY - 18}px, 0)`;
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${x - 2}px, ${y - 2}px, 0)`;
       }
-
-      animId = requestAnimationFrame(render);
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0)`;
+      }
+      frame = requestAnimationFrame(render);
     };
 
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    document.addEventListener("mouseleave", handleMouseLeave);
-    render();
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.addEventListener("pointerleave", hide);
+    frame = requestAnimationFrame(render);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      cancelAnimationFrame(animId);
+      window.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerleave", hide);
+      cancelAnimationFrame(frame);
     };
-  }, [isVisible]);
+  }, [enabled]);
 
-  if (!isVisible) return null;
+  if (!enabled) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden hidden md:block select-none">
-      {/* Central Cursor Point */}
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-[70] select-none">
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 w-2 h-2 rounded-full bg-cyan-400 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_10px_#00f2fe]"
+        className="fixed left-0 top-0 h-1 w-1 rounded-full bg-lume opacity-0 transition-opacity duration-[var(--dur-3)]"
       />
-
-      {/* Smooth Liquid Ring */}
       <div
         ref={ringRef}
-        className="fixed top-0 left-0 w-9 h-9 rounded-full border border-cyan-400/40 bg-cyan-500/10 backdrop-blur-[2px] shadow-[0_0_25px_rgba(0,242,254,0.3)] transition-opacity duration-300"
+        className="fixed left-0 top-0 h-8 w-8 rounded-full border border-lume-dim opacity-0 transition-opacity duration-[var(--dur-3)]"
       />
     </div>
   );

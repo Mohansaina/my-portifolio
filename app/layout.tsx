@@ -1,24 +1,42 @@
-import type { Metadata } from "next";
-import { Kanit, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Archivo, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const kanit = Kanit({
-  variable: "--font-kanit",
+// Display. Personality comes from optical width and size, not weight.
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
+  axes: ["wdth"],
+  display: "swap",
 });
 
+// Body.
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Utility face: labels, years, stats, code.
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Mohan Ruttala | Full Stack Engineer & Software Developer",
-  description: "Full Stack Engineer based in Visakhapatnam, India. Specializing in React, Next.js, TypeScript, Node.js, Python, & AI-driven digital experiences.",
-  keywords: ["Mohan Ruttala", "Full Stack Developer", "Visakhapatnam", "React Developer", "Next.js", "Software Engineer", "Web Applications"],
+  title: "Mohan Ruttala — Full-stack engineer",
+  description:
+    "Full-stack engineer in Visakhapatnam, India. React, Next.js, TypeScript, Node.js and Python — plus bespoke luxury jewelry storefronts.",
+  keywords: [
+    "Mohan Ruttala",
+    "Full Stack Developer",
+    "Visakhapatnam",
+    "React Developer",
+    "Next.js",
+    "Software Engineer",
+    "Web Applications",
+  ],
   authors: [{ name: "Mohan Ruttala" }],
   icons: {
     icon: [
@@ -30,6 +48,11 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#0b0c0e",
+  colorScheme: "dark",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,18 +61,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${kanit.variable} ${jetbrainsMono.variable} dark h-full antialiased`}
-      data-theme="cyan"
+      className={`${archivo.variable} ${instrumentSans.variable} ${jetbrainsMono.variable}`}
     >
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-full flex flex-col bg-[#07080c] text-on-surface selection:bg-cyan-500/30 selection:text-cyan-200">
-        {children}
-      </body>
+      <body className="bg-ink-0 text-text-mid">{children}</body>
     </html>
   );
 }

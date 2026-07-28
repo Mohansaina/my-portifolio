@@ -1,22 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
-import { ScrambleText } from "./ScrambleText";
+import React, { useMemo, useState } from "react";
+import { Section, SectionHeader } from "./ui/Section";
+import { Icon } from "./ui/Icon";
+import { useToast } from "./Toast";
+import { useReveal } from "../lib/motion";
 
 interface Snippet {
   id: string;
   name: string;
   language: string;
-  code: string;
   description: string;
+  code: string;
 }
 
-const snippets: Snippet[] = [
+const SNIPPETS: Snippet[] = [
   {
     id: "hook",
     name: "useSentimentScanner.ts",
-    language: "typescript",
-    description: "Custom React Hook for real-time sentiment analysis parsing and score calculation.",
+    language: "TypeScript",
+    description:
+      "The hook behind the review tool: one call site, loading state that cannot get stuck.",
     code: `import { useState, useCallback } from "react";
 
 export interface SentimentResult {
@@ -49,8 +53,9 @@ export function useSentimentScanner() {
   {
     id: "express",
     name: "reviewController.ts",
-    language: "typescript",
-    description: "Node.js & Express REST controller for processing business reviews with rate-limiting.",
+    language: "TypeScript",
+    description:
+      "Review analytics in one aggregate query rather than three round trips.",
     code: `import { Request, Response, NextFunction } from "express";
 import { db } from "../config/database";
 
@@ -58,7 +63,7 @@ export const getReviewAnalytics = async (req: Request, res: Response, next: Next
   try {
     const { businessId } = req.params;
     const analytics = await db.query(\`
-      SELECT 
+      SELECT
         COUNT(*) as total_reviews,
         AVG(rating) as avg_rating,
         COUNT(CASE WHEN sentiment = 'POSITIVE' THEN 1 END) as positive_count,
@@ -77,8 +82,9 @@ export const getReviewAnalytics = async (req: Request, res: Response, next: Next
   {
     id: "python",
     name: "dryerCalculator.py",
-    language: "python",
-    description: "Python utility algorithm calculating clothes drying efficiency index from weather telemetry.",
+    language: "Python",
+    description:
+      "The drying index: three weather factors, clamped and weighted.",
     code: `import math
 
 def calculate_drying_index(temp_c: float, humidity_pct: float, wind_speed_kmh: float) -> dict:
@@ -86,10 +92,10 @@ def calculate_drying_index(temp_c: float, humidity_pct: float, wind_speed_kmh: f
     temp_factor = max(0, min(1.0, (temp_c - 10) / 25))
     humidity_factor = max(0, min(1.0, (100 - humidity_pct) / 70))
     wind_factor = max(0, min(1.0, wind_speed_kmh / 40))
-    
+
     score = (temp_factor * 0.4 + humidity_factor * 0.45 + wind_factor * 0.15) * 100
     score = round(score, 1)
-    
+
     return {
         "drying_score": score,
         "efficiency": "EXCELLENT" if score > 75 else "MODERATE" if score > 45 else "POOR",
@@ -98,78 +104,146 @@ def calculate_drying_index(temp_c: float, humidity_pct: float, wind_speed_kmh: f
   },
 ];
 
-export const CodePlayground: React.FC<{ onShowToast: (msg: string) => void }> = ({ onShowToast }) => {
-  const [activeId, setActiveId] = useState("hook");
-  const activeSnippet = snippets.find((s) => s.id === activeId) || snippets[0];
+/**
+ * Three tones, all low saturation. Rainbow highlighting would fight the rest
+ * of the page for attention and reads as decoration; this is just enough
+ * contrast to find your place in the code.
+ */
+const TOKEN =
+  /(\/\/[^\n]*|#[^\n]*)|("""[\s\S]*?"""|`(?:[^`\\]|\\.)*`|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(import|from|export|const|let|var|function|return|async|await|if|elif|else|try|catch|finally|interface|type|class|def|new|for|while|in|of|as|not|is|None|True|False|null|undefined|public|private)\b/g;
 
-  const copyCode = () => {
-    navigator.clipboard.writeText(activeSnippet.code);
-    onShowToast(`Copied ${activeSnippet.name} to clipboard!`);
+function highlight(line: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  let last = 0;
+  let key = 0;
+
+  // `TOKEN` is module-level and stateful because of the /g flag; reset it
+  // before each line so matching always starts from the beginning.
+  TOKEN.lastIndex = 0;
+
+  let match: RegExpExecArray | null;
+  while ((match = TOKEN.exec(line)) !== null) {
+    if (match.index > last) nodes.push(line.slice(last, match.index));
+
+    const [text, comment, string] = match;
+    const className = comment
+      ? "text-text-lo italic"
+      : string
+        ? "text-lume-dim"
+        : "font-semibold text-text-hi";
+
+    nodes.push(
+      <span key={key++} className={className}>
+        {text}
+      </span>,
+    );
+    last = match.index + text.length;
+  }
+
+  if (last < line.length) nodes.push(line.slice(last));
+  return nodes;
+}
+
+export const CodePlayground: React.FC = () => {
+  const [activeId, setActiveId] = useState(SNIPPETS[0].id);
+  const active = SNIPPETS.find((s) => s.id === activeId) ?? SNIPPETS[0];
+  const toast = useToast();
+
+  useReveal();
+
+  const lines = useMemo(() => active.code.split("\n"), [active.code]);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(active.code);
+      toast("Copied", `${active.name} is on your clipboard.`);
+    } catch {
+      // Clipboard access fails on insecure origins and when the user has
+      // denied permission. Say so rather than claiming success.
+      toast("Copy failed", "Select the code and copy it manually.");
+    }
   };
 
   return (
-    <section id="playground" className="py-section-gap px-margin-mobile md:px-margin-desktop bg-[#07080c] border-t border-white/5">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
-          <div>
-            <span className="font-label-caps text-xs accent-text uppercase tracking-[0.2em] block mb-2">
-              CODE UTILITIES
-            </span>
-            <h2 className="hero-heading font-display-lg text-4xl md:text-5xl uppercase cursor-default">
-              <ScrambleText text="Code Playground" />
-            </h2>
-          </div>
-          <p className="font-body-md text-xs text-on-surface-variant/80 max-w-sm">
-            Inspect clean full-stack snippet architecture written by Mohan.
-          </p>
+    <Section id="code" className="border-t border-edge">
+      <SectionHeader
+        eyebrow="Code"
+        title="How the work reads up close."
+        lede="Three pieces pulled from the projects above."
+      />
+
+      <div className="reveal overflow-hidden rounded-lg border border-edge bg-ink-1 shadow-[var(--shadow-2),var(--lit-top)]">
+        <div
+          role="tablist"
+          aria-label="Code samples"
+          className="flex overflow-x-auto border-b border-edge"
+        >
+          {SNIPPETS.map((snippet) => {
+            const selected = snippet.id === activeId;
+            return (
+              <button
+                key={snippet.id}
+                role="tab"
+                aria-selected={selected}
+                aria-controls="code-panel"
+                onClick={() => setActiveId(snippet.id)}
+                className={`shrink-0 cursor-pointer border-b px-4 py-3 font-mono text-[12px]
+                  transition-colors duration-[var(--dur-2)]
+                  ${
+                    selected
+                      ? "border-lume bg-ink-2 text-text-hi"
+                      : "border-transparent text-text-lo hover:text-text-mid"
+                  }`}
+              >
+                {snippet.name}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Sandbox Window */}
-        <div className="bg-[#0f1118] border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-          {/* Header Bar */}
-          <div className="flex flex-wrap items-center justify-between bg-[#161822] border-b border-white/10 px-4 py-3 gap-2">
-            {/* Tabs */}
-            <div className="flex flex-wrap gap-2">
-              {snippets.map((snip) => (
-                <button
-                  key={snip.id}
-                  onClick={() => setActiveId(snip.id)}
-                  className={`px-3.5 py-1.5 rounded-xl font-code text-xs transition-all flex items-center gap-2 ${
-                    activeId === snip.id
-                      ? "bg-white/15 text-cyan-400 font-bold border border-cyan-500/30"
-                      : "text-white/60 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-sm">code</span>
-                  {snip.name}
-                </button>
-              ))}
-            </div>
-
-            {/* Copy Button */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-edge px-4 py-3">
+          <p className="text-[13px] text-text-mid">{active.description}</p>
+          <div className="flex items-center gap-3">
+            <span className="t-label">{active.language}</span>
             <button
-              onClick={copyCode}
-              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 text-white/80 hover:text-white font-label-caps text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              type="button"
+              onClick={copy}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xs px-2 py-1
+                font-mono text-[11px] uppercase tracking-[0.14em] text-text-lo
+                transition-colors duration-[var(--dur-2)] hover:text-text-hi"
             >
-              <span className="material-symbols-outlined text-sm">content_copy</span>
-              Copy Code
+              <Icon name="copy" size={13} />
+              Copy
             </button>
           </div>
+        </div>
 
-          {/* Description bar */}
-          <div className="px-6 py-3 bg-[#12141e] border-b border-white/5 font-body-md text-xs text-on-surface-variant/75 flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm text-cyan-400">info</span>
-            {activeSnippet.description}
-          </div>
-
-          {/* Code Viewer */}
-          <div className="p-6 overflow-x-auto max-h-[380px] font-code text-xs leading-relaxed text-on-surface select-text bg-[#090a0f]">
-            <pre className="whitespace-pre">
-              <code>{activeSnippet.code}</code>
-            </pre>
-          </div>
+        <div
+          id="code-panel"
+          role="tabpanel"
+          tabIndex={0}
+          className="max-h-[28rem] overflow-auto"
+        >
+          <pre className="min-w-max py-4 font-mono text-[12.5px] leading-[1.7]">
+            <code>
+              {lines.map((line, i) => (
+                <span key={i} className="flex">
+                  <span
+                    aria-hidden
+                    className="sticky left-0 w-12 shrink-0 select-none bg-ink-1 pr-4
+                      text-right text-text-lo/50"
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="pr-6 text-text-mid">
+                    {line ? highlight(line) : " "}
+                  </span>
+                </span>
+              ))}
+            </code>
+          </pre>
         </div>
       </div>
-    </section>
+    </Section>
   );
 };

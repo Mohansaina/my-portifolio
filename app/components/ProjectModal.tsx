@@ -1,6 +1,10 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import { Icon } from "./ui/Icon";
+import { ButtonLink } from "./ui/Button";
+import { useModal } from "../lib/motion";
 
 export interface ProjectData {
   id: string;
@@ -23,111 +27,131 @@ interface ProjectModalProps {
   onClose: () => void;
 }
 
-export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
+export const ProjectModal: React.FC<ProjectModalProps> = ({
+  project,
+  onClose,
+}) => {
+  const ref = useModal(project !== null, onClose);
   if (!project) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 md:p-8 overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-[#10121a] border border-white/10 max-w-4xl w-full rounded-3xl p-6 md:p-10 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-white/10 text-white/70 hover:text-white hover:bg-white/20 transition-all"
-          aria-label="Close modal"
-        >
-          <span className="material-symbols-outlined">close</span>
-        </button>
-
-        {/* Header */}
-        <div className="mb-6">
-          <span className="font-code text-xs accent-text font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20">
-            {project.category} • {project.year}
-          </span>
-          <h2 className="font-display-lg text-2xl md:text-4xl text-white font-bold uppercase mt-3">
-            {project.title}
-          </h2>
-          <p className="font-body-md text-sm text-on-surface-variant/80 mt-2">
-            {project.description}
-          </p>
-        </div>
-
-        {/* Image Showcase */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/40 h-56 md:h-64">
-            <img src={project.image1} alt={`${project.title} screenshot 1`} className="w-full h-full object-cover" />
-          </div>
-          <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/40 h-56 md:h-64">
-            <img src={project.image2} alt={`${project.title} screenshot 2`} className="w-full h-full object-cover" />
-          </div>
-        </div>
-
-        {/* Technical Deep Dive */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 border-t border-b border-white/10 py-6">
+    <div
+      className="fixed inset-0 z-[75] overflow-y-auto bg-ink-0/85 p-4 backdrop-blur-md md:p-8"
+      onMouseDown={(e) => {
+        // Dismiss on backdrop only. mousedown rather than click so a drag that
+        // starts inside the dialog and ends outside does not close it.
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-title"
+        tabIndex={-1}
+        className="surface mx-auto my-auto w-full max-w-3xl rounded-xl p-6 shadow-[var(--shadow-3),var(--lit-top)] md:p-10"
+      >
+        <div className="mb-8 flex items-start justify-between gap-6">
           <div>
-            <h4 className="font-display-lg text-sm text-white font-bold uppercase mb-2 flex items-center gap-2">
-              <span className="material-symbols-outlined accent-text text-lg">error_outline</span>
-              Problem Addressed
-            </h4>
-            <p className="font-body-md text-xs text-on-surface-variant/80 leading-relaxed">
-              {project.problem}
+            <p className="t-label mb-3">
+              {project.category} · {project.year}
             </p>
+            <h2 id="project-title" className="t-heading max-w-[24ch]">
+              {project.title}
+            </h2>
+            <p className="t-body mt-3">{project.description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="-mr-2 -mt-2 grid h-9 w-9 shrink-0 place-items-center rounded-md
+              text-text-lo transition-colors duration-[var(--dur-2)] hover:text-text-hi"
+          >
+            <Icon name="close" size={16} />
+          </button>
+        </div>
+
+        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {[project.image1, project.image2].map((src, i) => (
+            <div
+              key={src}
+              className="relative aspect-[16/10] overflow-hidden rounded-md border border-edge bg-ink-1"
+            >
+              <Image
+                src={src}
+                alt={`${project.title} — view ${i + 1}`}
+                fill
+                sizes="(max-width: 640px) 90vw, 45vw"
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-8 border-y border-edge py-8 sm:grid-cols-2">
+          <div>
+            <h3 className="t-label mb-3">The problem</h3>
+            <p className="t-body !text-[14px]">{project.problem}</p>
           </div>
           <div>
-            <h4 className="font-display-lg text-sm text-white font-bold uppercase mb-2 flex items-center gap-2">
-              <span className="material-symbols-outlined text-emerald-400 text-lg">verified</span>
-              Engineering Solution
-            </h4>
-            <p className="font-body-md text-xs text-on-surface-variant/80 leading-relaxed">
-              {project.solution}
-            </p>
+            <h3 className="t-label mb-3">What I built</h3>
+            <p className="t-body !text-[14px]">{project.solution}</p>
           </div>
         </div>
 
-        {/* Key Features */}
-        <div className="mb-8">
-          <h4 className="font-display-lg text-sm text-white font-bold uppercase mb-3">Key Features</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {project.features.map((feat, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs font-body-md text-on-surface-variant/90">
-                <span className="material-symbols-outlined accent-text text-sm">check_circle</span>
-                <span>{feat}</span>
-              </div>
+        <div className="py-8">
+          <h3 className="t-label mb-4">Key features</h3>
+          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {project.features.map((feature) => (
+              <li
+                key={feature}
+                className="flex items-start gap-2.5 text-[14px] text-text-mid"
+              >
+                <span className="mt-1 text-lume">
+                  <Icon name="check" size={13} />
+                </span>
+                {feature}
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
-        {/* Tech Stack Pills */}
-        <div className="mb-8">
-          <h4 className="font-display-lg text-sm text-white font-bold uppercase mb-3">Tech Stack</h4>
-          <div className="flex flex-wrap gap-2">
+        <div className="border-t border-edge py-8">
+          <h3 className="t-label mb-4">Built with</h3>
+          <ul className="flex flex-wrap gap-2">
             {project.techStack.map((tech) => (
-              <span key={tech} className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-label-caps text-white">
+              <li
+                key={tech}
+                className="rounded-xs border border-edge px-2.5 py-1 font-mono text-[11px] text-text-mid"
+              >
                 {tech}
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4 pt-4 border-t border-white/10">
-          <a
+        <div className="flex flex-wrap gap-3">
+          <ButtonLink
             href={project.demoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 text-center py-3.5 rounded-full ignition-gradient font-label-caps text-xs uppercase tracking-wider text-black font-bold hover:scale-105 transition-transform flex items-center justify-center gap-2"
+            variant="primary"
+            size="lg"
+            icon="arrow-up-right"
           >
-            Launch Live Application
-            <span className="material-symbols-outlined text-sm">launch</span>
-          </a>
-          <a
+            Open live site
+          </ButtonLink>
+          <ButtonLink
             href={project.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/15 text-white font-label-caps text-xs uppercase tracking-wider transition-colors flex items-center gap-2"
+            variant="secondary"
+            size="lg"
+            icon="github"
           >
-            View GitHub Source
-            <span className="material-symbols-outlined text-sm">code</span>
-          </a>
+            Source
+          </ButtonLink>
         </div>
       </div>
     </div>

@@ -1,221 +1,127 @@
 "use client";
 
 import React, { useState } from "react";
-import { ScrambleText } from "./ScrambleText";
+import { Eyebrow } from "./ui/Section";
+import { Icon, IconName } from "./ui/Icon";
+import { useToast } from "./Toast";
+import { useReveal } from "../lib/motion";
 
-interface ContactProps {
-  onMagnetButton: (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
-  onMagnetButtonReset: (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
-  onShowToast: (title: string, desc?: string) => void;
-}
+const EMAIL = "ruttalamohan23@gmail.com";
 
-export const Contact: React.FC<ContactProps> = ({
-  onMagnetButton,
-  onMagnetButtonReset,
-  onShowToast,
-}) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "Project Inquiry",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const SOCIALS: { label: string; href: string; icon: IconName }[] = [
+  {
+    label: "GitHub",
+    href: "https://github.com/Mohansaina",
+    icon: "github",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/mohan-sai-ruttala-a73484309/",
+    icon: "linkedin",
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/mohan_23_03_/",
+    icon: "instagram",
+  },
+  {
+    label: "X",
+    href: "https://x.com/MohanRutta17691",
+    icon: "x",
+  },
+];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      onShowToast("Validation Error", "Please complete all required fields.");
-      return;
+/**
+ * The contact form is gone.
+ *
+ * It never sent anything — it ran a setTimeout and then told the visitor
+ * their message had been delivered. A page built to demonstrate craft cannot
+ * open with a lie in its most important interaction. The email address is now
+ * the primary action: one click to copy, one click to open a mail client, and
+ * nothing in between that can silently fail.
+ */
+export const Contact: React.FC = () => {
+  const [copied, setCopied] = useState(false);
+  const toast = useToast();
+
+  useReveal();
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+      toast("Email copied", EMAIL);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Insecure origin or denied permission — fall back to the mail client
+      // rather than reporting a success that did not happen.
+      toast("Could not copy", "Opening your mail app instead.");
+      window.location.href = `mailto:${EMAIL}`;
     }
-
-    setIsSubmitting(true);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onShowToast(
-        "Message Sent Successfully!",
-        `Thank you ${formData.name}. Mohan will respond to your email shortly.`
-      );
-      setFormData({
-        name: "",
-        email: "",
-        subject: "Project Inquiry",
-        message: "",
-      });
-    }, 1000);
   };
 
   return (
-    <footer id="contact" className="bg-[#07080c] py-24 px-margin-mobile md:px-margin-desktop border-t border-white/10 relative z-40 developer-grid">
-      <div className="max-w-container-max mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-20">
-          {/* Left Column: Direct Info */}
-          <div className="lg:col-span-5">
-            <span className="font-label-caps text-xs accent-text uppercase tracking-[0.2em] block mb-2">
-              GET IN TOUCH
-            </span>
-            <h2 className="font-display-lg text-4xl md:text-5xl uppercase mb-6 cursor-default">
-              <ScrambleText text="Start a Project" />
-            </h2>
-            <p className="font-body-lg text-base text-on-surface-variant max-w-md mb-8 leading-relaxed">
-              I'm currently accepting new freelance web development projects and full-time software engineering contracts. Let's build something technically superior together.
-            </p>
+    <footer
+      id="contact"
+      className="relative border-t border-edge px-6 py-[var(--section-y)] md:px-16"
+    >
+      <div className="mx-auto max-w-wide">
+        <Eyebrow className="reveal mb-6">Contact</Eyebrow>
 
-            <a
-              onMouseMove={onMagnetButton}
-              onMouseLeave={onMagnetButtonReset}
-              className="font-display-lg text-xl sm:text-2xl md:text-3xl hover:text-cyan-400 transition-colors block border-b-2 border-white/20 pb-4 break-words font-bold mb-8"
-              href="mailto:ruttalamohan23@gmail.com"
-            >
-              ruttalamohan23@gmail.com
-            </a>
+        <h2 className="reveal t-display-l max-w-[16ch]">
+          Tell me what you are building.
+        </h2>
 
-            <div className="flex flex-wrap gap-3 items-center">
-              <a
-                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 hover:text-cyan-300 font-label-caps text-xs uppercase tracking-widest text-on-surface-variant transition-all flex items-center gap-2 group"
-                href="https://www.linkedin.com/in/mohan-sai-ruttala-a73484309/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="material-symbols-outlined text-sm text-cyan-400 group-hover:scale-110 transition-transform">work</span>
-                LinkedIn ↗
-              </a>
-              <a
-                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 hover:text-cyan-300 font-label-caps text-xs uppercase tracking-widest text-on-surface-variant transition-all flex items-center gap-2 group"
-                href="https://github.com/Mohansaina"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="material-symbols-outlined text-sm text-cyan-400 group-hover:scale-110 transition-transform">code</span>
-                GitHub ↗
-              </a>
-              <a
-                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-pink-500/50 hover:bg-pink-500/10 hover:text-pink-300 font-label-caps text-xs uppercase tracking-widest text-on-surface-variant transition-all flex items-center gap-2 group"
-                href="https://www.instagram.com/mohan_23_03_/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="material-symbols-outlined text-sm text-pink-400 group-hover:scale-110 transition-transform">photo_camera</span>
-                Instagram ↗
-              </a>
-              <a
-                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-sky-400/50 hover:bg-sky-500/10 hover:text-sky-300 font-label-caps text-xs uppercase tracking-widest text-on-surface-variant transition-all flex items-center gap-2 group"
-                href="https://x.com/MohanRutta17691"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="material-symbols-outlined text-sm text-sky-400 group-hover:scale-110 transition-transform">tag</span>
-                X (Twitter) ↗
-              </a>
-            </div>
-          </div>
+        <p className="reveal t-body-l mt-6">
+          Open to full-time engineering roles, jewelry and luxury retail
+          storefronts, and freelance projects. I reply within a day.
+        </p>
 
-          {/* Right Column: Contact Form */}
-          <div className="lg:col-span-7 glass-card p-8 md:p-10 rounded-3xl">
-            <h3 className="font-display-lg text-xl text-white uppercase font-bold mb-6">
-              Send a Direct Message
-            </h3>
+        <div className="reveal mt-12 flex flex-col gap-4 border-y border-edge py-8 sm:flex-row sm:items-center sm:justify-between">
+          <a
+            href={`mailto:${EMAIL}`}
+            className="font-display text-[clamp(22px,4vw,44px)] font-medium tracking-[-0.02em]
+              text-text-hi underline decoration-edge-hi underline-offset-[10px]
+              transition-colors duration-[var(--dur-2)] hover:decoration-lume"
+          >
+            {EMAIL}
+          </a>
 
-            {/* Subject Preset Selector */}
-            <div className="mb-6">
-              <label className="font-label-caps text-xs text-white/70 uppercase tracking-wider block mb-2">
-                I'm interested in:
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {["Full-Time Role / Startup", "Jewelry Store Website", "Freelance Project", "Technical Audit / AI", "General Inquiry"].map((subj) => (
-                  <button
-                    key={subj}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, subject: subj })}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-label-caps transition-all ${
-                      formData.subject === subj
-                        ? "bg-white/20 text-white font-bold border border-cyan-400/40"
-                        : "bg-white/5 text-white/60 hover:text-white"
-                    }`}
-                  >
-                    {subj}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-label-caps text-xs text-white/70 uppercase tracking-wider block mb-1">
-                    Your Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. John Doe"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="font-label-caps text-xs text-white/70 uppercase tracking-wider block mb-1">
-                    Your Email *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="john@company.com"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="font-label-caps text-xs text-white/70 uppercase tracking-wider block mb-1">
-                  Message Details *
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Tell me about your project goals, timelines, or technology requirements..."
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                onMouseMove={onMagnetButton}
-                onMouseLeave={onMagnetButtonReset}
-                className="w-full py-4 rounded-full ignition-gradient font-label-caps text-xs uppercase tracking-widest text-black font-bold hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 cursor-pointer shadow-xl disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  "Sending Message..."
-                ) : (
-                  <>
-                    SEND MESSAGE{" "}
-                    <span className="material-symbols-outlined text-sm">send</span>
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
+          <button
+            type="button"
+            onClick={copyEmail}
+            className="inline-flex shrink-0 cursor-pointer items-center gap-2 self-start rounded-md
+              border border-edge px-4 py-2.5 text-[13px] text-text-mid transition-colors
+              duration-[var(--dur-2)] hover:border-edge-hi hover:text-text-hi sm:self-auto"
+          >
+            <Icon name={copied ? "check" : "copy"} size={14} />
+            {copied ? "Copied" : "Copy address"}
+          </button>
         </div>
 
-        {/* Footer Bottom */}
-        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 gap-6">
-          <div className="font-display-lg text-xl text-white font-bold tracking-tighter">
-            MOHAN RUTTALA
-          </div>
-          <div className="font-body-md text-xs text-white/40 uppercase tracking-wider text-center">
-            © 2025 MOHAN RUTTALA. ALL RIGHTS RESERVED. VISAKHAPATNAM, INDIA.
-          </div>
-          <div className="flex gap-6 text-xs font-label-caps text-white/60">
-            <a href="#" className="hover:text-white transition-colors">PRIVACY POLICY</a>
-            <a href="#" className="hover:text-white transition-colors">TERMS OF SERVICE</a>
-          </div>
+        <ul className="reveal mt-8 flex flex-wrap gap-x-8 gap-y-3">
+          {SOCIALS.map((social) => (
+            <li key={social.label}>
+              <a
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xs text-[14px] text-text-lo
+                  transition-colors duration-[var(--dur-2)] hover:text-text-hi"
+              >
+                <Icon name={social.icon} size={15} />
+                {social.label}
+                <Icon name="arrow-up-right" size={12} />
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-24 flex flex-col gap-4 border-t border-edge pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="t-label">
+            © {new Date().getFullYear()} Mohan Ruttala · Visakhapatnam, India
+          </p>
+          <p className="t-label">Built with Next.js</p>
         </div>
       </div>
     </footer>

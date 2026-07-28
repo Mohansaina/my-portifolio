@@ -1,0 +1,232 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
+function subscribeToReducedMotion(onChange: () => void) {
+  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+/**
+ * Tracks the OS reduced-motion setting and reacts to changes at runtime.
+ *
+ * `useSyncExternalStore` rather than state-in-an-effect: matchMedia is an
+ * external store, and this keeps the hydration render matching the server
+ * before switching to the real value.
+ */
+export function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeToReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
+    () => false,
+  );
+}
+
+/**
+ * The signature interaction: light raking across an edge.
+ *
+ * Publishes the pointer position as `--lx` / `--ly` on the element so the
+ * `.lit` gradient border-mask can follow it. Writes are coalesced into one
+ * rAF per frame, so a burst of pointermove events costs a single style write.
+ */
+export function usePointerLight<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const frame = useRef<number | null>(null);
+  const next = useRef<{ x: number; y: number } | null>(null);
+  const reduced = usePrefersReducedMotion();
+
+  useEffect(() => {
+    return () => {
+      if (frame.current !== null) cancelAnimationFrame(frame.current);
+    };
+  }, []);
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent<T>) => {
+      // Coarse pointers have no hover, so there is no light to move.
+      if (reduced || e.pointerType === "touch") return;
+
+      const el = e.currentTarget;
+      const rect = el.getBoundingClientRect();
+      next.current = {
+        x: ((e.clientX - rect.left) / rect.width) * 100,
+        y: ((e.clientY - rect.top) / rect.height) * 100,
+      };
+
+      if (frame.current !== null) return;
+      frame.current = requestAnimationFrame(() => {
+        frame.current = null;
+        const pos = next.current;
+        if (!pos || !el.isConnected) return;
+        el.style.setProperty("--lx", `${pos.x}%`);
+        el.style.setProperty("--ly", `${pos.y}%`);
+      });
+    },
+    [reduced],
+  );
+
+  return { ref, onPointerMove };
+}
+
+/**
+ * Reveals `.reveal` elements once as they enter the viewport.
+ *
+ * One observer for the whole page. Elements are re-collected whenever `deps`
+ * change, so content mounted later (filtered lists, tab panels) still gets
+ * picked up — the previous implementation only ever observed what existed on
+ * first mount.
+ */
+export function useReveal(deps: unknown[] = []) {
+  useEffect(() => {
+    const nodes = Array.from(
+      document.querySelectorAll<HTMLElement>(".reveal:not(.is-in)"),
+    );
+    if (nodes.length === 0) return;
+
+    if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
+      nodes.forEach((el) => el.classList.add("is-in"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
+    );
+
+    nodes.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+}
+
+/**
+ * Counts up to `target` once the element scrolls into view.
+ *
+ * Driven by rAF against a wall clock rather than setInterval, so the duration
+ * holds regardless of frame rate and the value always lands exactly on target.
+ */
+export function useCountUp(target: number, duration = 1200) {
+  const ref = useRef<HTMLElement>(null);
+  const [animated, setAnimated] = useState(0);
+  const reduced = usePrefersReducedMotion();
+
+  useEffect(() => {
+    if (reduced) return;
+
+    const el = ref.current;
+    if (!el) return;
+
+    let frame: number;
+    let start: number | null = null;
+
+    const step = (now: number) => {
+      if (start === null) start = now;
+      const t = Math.min(1, (now - start) / duration);
+      // easeOutExpo — fast arrival, gentle settle. No overshoot.
+      const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      setAnimated(Math.round(target * eased));
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return;
+        observer.disconnect();
+        frame = requestAnimationFrame(step);
+      },
+      { threshold: 0.3 },
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [target, duration, reduced]);
+
+  // With motion reduced the number is simply the number, no ramp.
+  return { ref, value: reduced ? target : animated };
+}
+
+/**
+ * Modal plumbing: Esc to close, focus trapped inside, focus restored to
+ * whatever opened it, and the page behind locked without shifting when the
+ * scrollbar disappears.
+ */
+export function useModal(open: boolean, onClose: () => void) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const opener = document.activeElement as HTMLElement | null;
+    const { body, documentElement } = document;
+    const scrollbar = window.innerWidth - documentElement.clientWidth;
+    const prevOverflow = body.style.overflow;
+    const prevPadding = body.style.paddingRight;
+
+    body.style.overflow = "hidden";
+    if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+
+    const FOCUSABLE =
+      'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])';
+
+    // Move focus into the dialog so the next Tab stays inside it.
+    requestAnimationFrame(() => {
+      const first = ref.current?.querySelector<HTMLElement>(FOCUSABLE);
+      (first ?? ref.current)?.focus();
+    });
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key !== "Tab" || !ref.current) return;
+
+      const items = Array.from(
+        ref.current.querySelectorAll<HTMLElement>(FOCUSABLE),
+      ).filter((el) => el.offsetParent !== null);
+      if (items.length === 0) return;
+
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPadding;
+      opener?.focus?.();
+    };
+  }, [open, onClose]);
+
+  return ref;
+}

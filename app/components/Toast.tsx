@@ -1,57 +1,96 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Icon } from "./ui/Icon";
 
 export interface ToastMessage {
   id: string;
   title: string;
   description?: string;
-  type?: "success" | "info" | "warning";
 }
 
-interface ToastProps {
-  toasts: ToastMessage[];
-  onDismiss: (id: string) => void;
-}
+type ToastFn = (title: string, description?: string) => void;
 
-export const Toast: React.FC<ToastProps> = ({ toasts, onDismiss }) => {
+const ToastContext = createContext<ToastFn>(() => {});
+
+/** Call from any client component: `const toast = useToast()`. */
+export const useToast = () => useContext(ToastContext);
+
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const dismiss = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const toast = useCallback<ToastFn>((title, description) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    // Keep at most three on screen; older ones drop off the top.
+    setToasts((prev) => [...prev.slice(-2), { id, title, description }]);
+  }, []);
+
+  const value = useMemo(() => toast, [toast]);
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm pointer-events-none">
-      {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
-      ))}
-    </div>
+    <ToastContext.Provider value={value}>
+      {children}
+      <div
+        // Announced without stealing focus: confirmations are informative,
+        // not interruptions.
+        role="status"
+        aria-live="polite"
+        className="pointer-events-none fixed bottom-8 left-1/2 z-[65] flex w-[calc(100%-48px)]
+          max-w-sm -translate-x-1/2 flex-col gap-2"
+      >
+        {toasts.map((t) => (
+          <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
+        ))}
+      </div>
+    </ToastContext.Provider>
   );
 };
 
-const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: (id: string) => void }> = ({
-  toast,
-  onDismiss,
-}) => {
+const ToastItem: React.FC<{
+  toast: ToastMessage;
+  onDismiss: (id: string) => void;
+}> = ({ toast, onDismiss }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onDismiss(toast.id);
-    }, 4000);
+    const timer = setTimeout(() => onDismiss(toast.id), 3600);
     return () => clearTimeout(timer);
   }, [toast.id, onDismiss]);
 
   return (
-    <div className="pointer-events-auto bg-[#161820]/95 border border-white/10 text-primary p-4 rounded-xl shadow-2xl backdrop-blur-xl flex items-start gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300">
-      <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg shrink-0">
-        <span className="material-symbols-outlined text-lg">check_circle</span>
-      </div>
-      <div className="flex-1">
-        <h4 className="font-label-caps text-sm font-bold text-white tracking-wide">{toast.title}</h4>
+    <div
+      className="surface pointer-events-auto flex items-start gap-3 rounded-md px-4 py-3
+        shadow-[var(--shadow-2),var(--lit-top)]"
+      style={{ animation: "toast-in var(--dur-4) var(--ease) both" }}
+    >
+      <span className="mt-0.5 text-lume">
+        <Icon name="check" size={15} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-medium text-text-hi">{toast.title}</p>
         {toast.description && (
-          <p className="font-body-md text-xs text-on-surface-variant/80 mt-0.5">{toast.description}</p>
+          <p className="mt-0.5 text-[12px] text-text-lo">{toast.description}</p>
         )}
       </div>
       <button
+        type="button"
         onClick={() => onDismiss(toast.id)}
-        className="text-on-surface-variant/50 hover:text-white transition-colors p-1"
-        aria-label="Dismiss toast"
+        aria-label="Dismiss"
+        className="-mr-1 -mt-1 rounded-xs p-1 text-text-lo transition-colors
+          duration-[var(--dur-2)] hover:text-text-hi"
       >
-        <span className="material-symbols-outlined text-sm">close</span>
+        <Icon name="close" size={13} />
       </button>
     </div>
   );

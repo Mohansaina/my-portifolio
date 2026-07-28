@@ -1,129 +1,150 @@
 "use client";
 
-import React, { useRef } from "react";
-import { ParticleCanvas } from "./ParticleCanvas";
-import { ScrambleText } from "./ScrambleText";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { ButtonLink } from "./ui/Button";
+import { usePrefersReducedMotion } from "../lib/motion";
 
-interface HeroProps {
-  onMagnetButton: (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
-  onMagnetButtonReset: (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
-}
+/**
+ * The hero is the thesis: what he does, for whom, and one lit object.
+ *
+ * Everything that used to compete here — the orbiting tech tiles, two pulsing
+ * aura rings, a particle canvas, a cursor spotlight and an ambient glow — is
+ * gone. What remains is a sentence, a portrait, and one way in.
+ */
+export const Hero: React.FC = () => {
+  const portraitRef = useRef<HTMLDivElement>(null);
+  const frame = useRef<number | null>(null);
+  const reduced = usePrefersReducedMotion();
+  const [localTime, setLocalTime] = useState<string | null>(null);
 
-export const Hero: React.FC<HeroProps> = ({ onMagnetButton, onMagnetButtonReset }) => {
-  const magnetWrapRef = useRef<HTMLDivElement>(null);
+  /* His actual local time. Small, true, and quietly says "there is a person
+     at the other end of this". Rendered only after mount so the server and
+     client markup agree. */
+  useEffect(() => {
+    const tick = () =>
+      setLocalTime(
+        new Intl.DateTimeFormat("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Asia/Kolkata",
+        }).format(new Date()),
+      );
+    tick();
+    const id = setInterval(tick, 30_000);
+    return () => clearInterval(id);
+  }, []);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const container = e.currentTarget;
-    const { left, top, width, height } = container.getBoundingClientRect();
-    const x = (e.clientX - left - width / 2) * 0.2;
-    const y = (e.clientY - top - height / 2) * 0.2;
-    if (magnetWrapRef.current) {
-      magnetWrapRef.current.style.transform = `translate(${x}px, ${y}px)`;
-    }
-  };
+  useEffect(() => {
+    return () => {
+      if (frame.current !== null) cancelAnimationFrame(frame.current);
+    };
+  }, []);
 
-  const handleMouseLeave = () => {
-    if (magnetWrapRef.current) {
-      magnetWrapRef.current.style.transform = "translate(0, 0)";
-    }
-  };
+  /* Parallax capped at 10px — the brief allows 8–12px and calls dramatic
+     parallax out explicitly. */
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLElement>) => {
+      if (reduced || e.pointerType === "touch") return;
+      const el = portraitRef.current;
+      if (!el) return;
 
-  const handleSpotlightMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
-    e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
-  };
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+      if (frame.current !== null) return;
+      frame.current = requestAnimationFrame(() => {
+        frame.current = null;
+        el.style.transform = `translate3d(${(x * -10).toFixed(2)}px, ${(y * -10).toFixed(2)}px, 0)`;
+      });
+    },
+    [reduced],
+  );
+
+  const onPointerLeave = useCallback(() => {
+    const el = portraitRef.current;
+    if (el) el.style.transform = "translate3d(0, 0, 0)";
+  }, []);
 
   return (
     <section
-      onMouseMove={handleSpotlightMouseMove}
-      className="relative min-h-screen flex flex-col items-center justify-center pt-28 pb-16 overflow-hidden bg-[#07080c] developer-grid flashlight-spotlight"
+      id="top"
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
+      className="relative px-6 pb-24 pt-40 md:px-16 md:pb-32 md:pt-48"
     >
-      <div className="absolute inset-0 ambient-glow pointer-events-none" />
-      <ParticleCanvas />
+      <div className="mx-auto grid max-w-wide grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-12">
+        <div className="lg:col-span-7">
+          <p className="reveal mb-8 inline-flex items-center gap-2.5 rounded-full border border-edge bg-ink-2/60 py-1.5 pl-3 pr-4">
+            <span className="h-1.5 w-1.5 rounded-full bg-jade" />
+            <span className="t-label !text-text-mid">Available for work</span>
+          </p>
 
-      {/* Main Content */}
-      <div className="text-center z-10 px-margin-mobile max-w-4xl mx-auto flex flex-col items-center">
-        {/* Status Badge */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-surface-container-high/60 border border-white/10 backdrop-blur-md mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-          <span className="font-label-caps text-xs text-on-surface-variant/90 tracking-widest uppercase">
-            OPEN FOR STARTUP ROLES & JEWELRY STORE E-COMMERCE
-          </span>
-        </div>
+          <h1
+            className="reveal t-display-xl text-balance"
+            style={{ ["--reveal-delay" as string]: "60ms" }}
+          >
+            I build the whole product.
+          </h1>
 
-        {/* Heading */}
-        <h1 className="hero-heading font-display-2xl text-[54px] sm:text-[84px] md:text-[100px] uppercase italic leading-none mb-8 tracking-tighter cursor-default select-none">
-          <ScrambleText text="Hi, i'm Mohan" />
-        </h1>
+          <p
+            className="reveal t-body-l mt-8"
+            style={{ ["--reveal-delay" as string]: "120ms" }}
+          >
+            Full-stack engineer in Visakhapatnam, India. Founders bring me
+            0-to-1 web applications. Jewelry brands bring me storefronts that
+            sell.
+          </p>
 
-        {/* Magnetic Profile Container */}
-        <div
-          className="magnet-container relative w-64 h-64 sm:w-80 sm:h-80 md:w-[340px] md:h-[340px] mx-auto group cursor-pointer mb-10"
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        >
-          {/* Pulsing Aura Rings */}
-          <div className="absolute inset-0 rounded-full border border-white/10 scale-105 group-hover:scale-110 group-hover:border-amber-400/40 transition-all duration-700 animate-pulse pointer-events-none" />
-          <div className="absolute inset-0 rounded-full border border-white/5 scale-110 group-hover:scale-120 group-hover:border-cyan-500/20 transition-all duration-1000 animate-ping pointer-events-none [animation-duration:4s]" />
-
-          <div ref={magnetWrapRef} className="magnet-wrap w-full h-full">
-            <img
-              className="w-full h-full object-cover rounded-full border-4 border-white/10 group-hover:border-cyan-400/40 transition-all duration-500 shadow-[0_0_60px_rgba(0,242,254,0.12)]"
-              alt="Mohan Ruttala Portrait - Full Stack Developer based in Visakhapatnam, Andhra Pradesh, India."
-              src="/myprofile.jpg"
-            />
-          </div>
-
-          {/* Interactive Tech Orbits */}
-          <div className="absolute -top-4 -left-4 w-14 h-14 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-amber-400/50 transition-all duration-300 animate-float-slow select-none">
-            <span className="material-symbols-outlined text-amber-400 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-              diamond
-            </span>
-          </div>
-          <div className="absolute -bottom-4 -right-4 w-14 h-14 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-cyan-400/40 transition-all duration-300 animate-float-medium select-none">
-            <span className="material-symbols-outlined accent-text text-2xl">
-              database
-            </span>
-          </div>
-          <div className="absolute top-10 -right-10 w-12 h-12 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-cyan-400/40 transition-all duration-300 animate-float-fast select-none">
-            <span className="material-symbols-outlined accent-text text-xl">
-              terminal
-            </span>
-          </div>
-          <div className="absolute bottom-10 -left-10 w-12 h-12 bg-[#14161f]/80 border border-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl group-hover:border-cyan-400/40 transition-all duration-300 animate-float-slow select-none">
-            <span className="material-symbols-outlined accent-text text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-              layers
-            </span>
+          <div
+            className="reveal mt-10 flex flex-wrap items-center gap-6"
+            style={{ ["--reveal-delay" as string]: "180ms" }}
+          >
+            <ButtonLink
+              href="#contact"
+              variant="primary"
+              size="lg"
+              icon="arrow-right"
+            >
+              Start a project
+            </ButtonLink>
+            <ButtonLink href="#work" variant="ghost" icon="arrow-down">
+              See the work
+            </ButtonLink>
           </div>
         </div>
 
-        {/* Hero Actions */}
-        <div className="flex flex-wrap justify-center gap-4 z-20">
-          <a
-            href="#contact"
-            onMouseMove={onMagnetButton}
-            onMouseLeave={onMagnetButtonReset}
-            className="ignition-gradient px-8 py-4 rounded-full font-label-caps text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-xl flex items-center gap-2 cursor-pointer select-none"
+        <div className="lg:col-span-5">
+          <figure
+            ref={portraitRef}
+            className="reveal transition-transform duration-[var(--dur-5)] ease-[var(--ease)] will-change-transform"
+            style={{ ["--reveal-delay" as string]: "240ms" }}
           >
-            CONTACT ME{" "}
-            <span className="material-symbols-outlined text-sm">
-              arrow_outward
-            </span>
-          </a>
-          <a
-            href="#projects"
-            onMouseMove={onMagnetButton}
-            onMouseLeave={onMagnetButtonReset}
-            className="px-8 py-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 font-label-caps text-xs uppercase tracking-widest text-white transition-transform flex items-center gap-2 cursor-pointer select-none"
-          >
-            EXPLORE WORKS
-            <span className="material-symbols-outlined text-sm">
-              keyboard_arrow_down
-            </span>
-          </a>
+            <div className="lit relative overflow-hidden rounded-xl border border-edge shadow-[var(--shadow-3),var(--lit-top)]">
+              <Image
+                src="/myprofile.jpg"
+                alt="Mohan Ruttala"
+                width={720}
+                height={860}
+                priority
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                className="h-full w-full object-cover"
+              />
+              {/* A single soft key light from above-left, so the portrait sits
+                  in the same lighting as every other surface. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-[linear-gradient(160deg,rgba(232,217,184,0.10),transparent_45%)]"
+              />
+            </div>
+
+            <figcaption className="mt-4 flex items-center justify-between gap-4">
+              <span className="t-label">Visakhapatnam, IN</span>
+              <span className="t-mono tabular-nums">
+                {localTime ? `${localTime} local` : " "}
+              </span>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>
