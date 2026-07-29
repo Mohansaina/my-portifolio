@@ -6,6 +6,7 @@ import { CommandPalette } from "./components/CommandPalette";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { Marquee } from "./components/Marquee";
+import { Proof } from "./components/Proof";
 import { Projects } from "./components/Projects";
 import { Services } from "./components/Services";
 import { About } from "./components/About";
@@ -34,6 +35,9 @@ export default function Home() {
 
       <main className="relative z-10">
         <Hero />
+        {/* Proof sits directly under the hero: the figures that stand up to a
+            click belong before the argument, not after it. */}
+        <Proof />
         <Marquee />
         <Projects />
         <Services />

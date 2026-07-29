@@ -33,8 +33,10 @@ const PROJECTS: ProjectData[] = [
       "Shopify API",
       "Stripe",
     ],
-    demoUrl: "#services",
-    repoUrl: "https://github.com/Mohansaina/my-portifolio",
+    /* No demoUrl or repoUrl: this one is not deployed publicly. The card
+       previously linked "Open live site" to "#services", which scrolled the
+       page instead of opening anything, and "Source" to the portfolio's own
+       repository. Both are now simply absent and the card says so. */
     image1: "/jewelry_store_hero.png",
     image2: "/jewelry_customizer_app.png",
   },
@@ -230,31 +232,45 @@ const ProjectCard: React.FC<{
 
       {/* Lifted above the stretched layer so these stay independently
           clickable. */}
+      {/* Lifted above the stretched layer so these stay independently
+          clickable. The label reports what is actually behind the icons —
+          it used to read "Live · Source" on every card, including one with
+          neither. */}
       <div className="relative z-[2] flex items-center justify-between gap-4 border-t border-edge px-8 py-4">
-        <span className="t-label">Live · Source</span>
+        <span className="t-label">
+          {project.demoUrl && project.repoUrl
+            ? "Live · Source"
+            : project.repoUrl
+              ? "Source"
+              : "Case study"}
+        </span>
         <span className="flex items-center gap-1">
-          <a
-            href={project.demoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${project.title} — open live site`}
-            className="grid h-10 w-10 place-items-center rounded-sm text-text-lo
-              transition-colors duration-[var(--dur-2)] hover:bg-ink-3
-              hover:text-text-hi active:translate-y-px"
-          >
-            <Icon name="arrow-up-right" size={15} />
-          </a>
-          <a
-            href={project.repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${project.title} — view source`}
-            className="grid h-10 w-10 place-items-center rounded-sm text-text-lo
-              transition-colors duration-[var(--dur-2)] hover:bg-ink-3
-              hover:text-text-hi active:translate-y-px"
-          >
-            <Icon name="github" size={15} />
-          </a>
+          {project.demoUrl && (
+            <a
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${project.title} — open live site`}
+              className="grid h-10 w-10 place-items-center rounded-sm text-text-lo
+                transition-colors duration-[var(--dur-2)] hover:bg-ink-3
+                hover:text-text-hi active:translate-y-px"
+            >
+              <Icon name="arrow-up-right" size={15} />
+            </a>
+          )}
+          {project.repoUrl && (
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${project.title} — view source`}
+              className="grid h-10 w-10 place-items-center rounded-sm text-text-lo
+                transition-colors duration-[var(--dur-2)] hover:bg-ink-3
+                hover:text-text-hi active:translate-y-px"
+            >
+              <Icon name="github" size={15} />
+            </a>
+          )}
         </span>
       </div>
     </li>

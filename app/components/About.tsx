@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { Section, SectionHeader } from "./ui/Section";
-import { useCountUp, useReveal } from "../lib/motion";
+import { useReveal } from "../lib/motion";
 
 const TABS = [
   { id: "bio", label: "Bio" },
@@ -12,11 +12,10 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
-const STATS = [
-  { value: 3, suffix: "+", label: "Years building" },
-  { value: 15, suffix: "+", label: "Projects delivered" },
-  { value: 10, suffix: "+", label: "Clients served" },
-];
+/* The stats grid that used to close this section — "15+ projects delivered",
+   "10+ clients served" — is gone. It sat a few hundred pixels below four
+   visible projects, and a claim the page itself contradicts is worse than no
+   claim. Verifiable figures now open the page instead, in <Proof>. */
 
 export const About: React.FC = () => {
   const [tab, setTab] = useState<TabId>("bio");
@@ -133,29 +132,6 @@ export const About: React.FC = () => {
         )}
       </div>
 
-      <dl className="reveal mt-16 grid grid-cols-3 gap-8 border-t border-edge pt-10">
-        {STATS.map((stat) => (
-          <Stat key={stat.label} {...stat} />
-        ))}
-      </dl>
     </Section>
-  );
-};
-
-const Stat: React.FC<{ value: number; suffix: string; label: string }> = ({
-  value,
-  suffix,
-  label,
-}) => {
-  const { ref, value: current } = useCountUp(value);
-
-  return (
-    <div ref={ref as React.Ref<HTMLDivElement>}>
-      <dd className="font-display text-4xl font-medium tabular-nums tracking-tight text-text-hi md:text-5xl">
-        {current}
-        {suffix}
-      </dd>
-      <dt className="t-label mt-3">{label}</dt>
-    </div>
   );
 };

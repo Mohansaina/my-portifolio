@@ -16,8 +16,10 @@ export interface ProjectData {
   solution: string;
   features: string[];
   techStack: string[];
-  demoUrl: string;
-  repoUrl: string;
+  /* Optional on purpose. A project without a running deployment should say so
+     rather than render a button that goes nowhere. */
+  demoUrl?: string;
+  repoUrl?: string;
   image1: string;
   image2: string;
 }
@@ -131,27 +133,34 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
           </ul>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <ButtonLink
-            href={project.demoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="primary"
-            size="lg"
-            icon="arrow-up-right"
-          >
-            Open live site
-          </ButtonLink>
-          <ButtonLink
-            href={project.repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="secondary"
-            size="lg"
-            icon="github"
-          >
-            Source
-          </ButtonLink>
+        <div className="flex flex-wrap items-center gap-3">
+          {project.demoUrl && (
+            <ButtonLink
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="primary"
+              size="lg"
+              icon="arrow-up-right"
+            >
+              Open live site
+            </ButtonLink>
+          )}
+          {project.repoUrl && (
+            <ButtonLink
+              href={project.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+              size="lg"
+              icon="github"
+            >
+              Source
+            </ButtonLink>
+          )}
+          {!project.demoUrl && !project.repoUrl && (
+            <p className="t-label">Case study · not publicly deployed</p>
+          )}
         </div>
       </div>
     </div>
