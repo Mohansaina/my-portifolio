@@ -112,12 +112,12 @@ export const Hero: React.FC = () => {
         />
       </div>
 
-      <div className="relative mx-auto grid max-w-wide grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-12">
+      <div className="hero-depart relative mx-auto grid max-w-wide grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-7">
           {/* Glass: low opacity, soft blur, thin border, one top highlight. */}
           <p className="reveal mb-8 inline-flex items-center gap-2.5 rounded-full border border-edge bg-ink-2/50 py-1.5 pl-3 pr-4 shadow-[var(--lit-top)] backdrop-blur-md">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute -inset-1 rounded-full bg-jade/25" />
+              <span className="status-halo absolute -inset-1 rounded-full bg-jade/40" />
               <span className="relative h-1.5 w-1.5 rounded-full bg-jade" />
             </span>
             <span className="t-label !text-text-mid">Available for work</span>
@@ -144,16 +144,17 @@ export const Hero: React.FC = () => {
             sell.
           </p>
 
+          {/* Arrive one at a time — three separate claims, not one block. */}
           <ul
-            className="reveal mt-8 flex flex-wrap items-center gap-x-5 gap-y-2"
+            className="reveal-rows mt-8 flex flex-wrap items-center gap-x-5 gap-y-2"
             style={{ ["--reveal-delay" as string]: "320ms" }}
           >
             {SPECIALISMS.map((item, i) => (
               <li key={item} className="flex items-center gap-5">
-                {i > 0 && (
-                  <span aria-hidden className="h-3 w-px bg-edge-hi" />
-                )}
-                <span className="t-label !text-text-mid">{item}</span>
+                {i > 0 && <span aria-hidden className="h-3 w-px bg-edge-hi" />}
+                <span className="t-label !text-text-mid transition-colors duration-[var(--dur-2)] hover:!text-text-hi">
+                  {item}
+                </span>
               </li>
             ))}
           </ul>
@@ -216,6 +217,8 @@ export const Hero: React.FC = () => {
                   aria-hidden
                   className="pointer-events-none absolute inset-0 bg-[radial-gradient(115%_95%_at_50%_35%,transparent_42%,rgba(11,12,14,0.55)_100%)]"
                 />
+                {/* One pass of light across the surface, just after it lands. */}
+                <div aria-hidden className="specular" />
               </div>
             </figure>
 
@@ -231,7 +234,14 @@ export const Hero: React.FC = () => {
               >
                 <p className="t-label">{site.locationShort}</p>
                 <p className="mt-1 font-mono text-[13px] tabular-nums text-text-hi">
-                  {localTime ? `${localTime} IST` : "—"}
+                  {/* Keyed on the value so each new minute arrives rather
+                      than blinking into place. */}
+                  <span
+                    key={localTime ?? "pending"}
+                    className="inline-block animate-[value-in_var(--dur-3)_var(--ease)_both]"
+                  >
+                    {localTime ? `${localTime} IST` : "—"}
+                  </span>
                 </p>
               </div>
             </div>
