@@ -45,7 +45,7 @@ export const Testimonials: React.FC = () => {
           <li
             key={item.name}
             className="reveal"
-            style={{ ["--reveal-delay" as string]: `${i * 60}ms` }}
+            style={{ ["--reveal-delay" as string]: `${i * 80}ms` }}
           >
             <figure>
               {/* Pulled up to 21px: the serif needs the size to keep its

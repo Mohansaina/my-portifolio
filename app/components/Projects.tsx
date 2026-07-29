@@ -131,7 +131,7 @@ export const Projects: React.FC = () => {
   useReveal();
 
   return (
-    <Section id="work" width="wide">
+    <Section id="work" width="wide" pin>
       <SectionHeader
         eyebrow={`Selected work · ${PROJECTS.length} projects`}
         title="Things I have shipped."
@@ -173,18 +173,22 @@ const ProjectCard: React.FC<{
       onPointerMove={onPointerMove}
       className="stack-item reveal lit surface group relative overflow-hidden rounded-xl
         shadow-[var(--shadow-3),var(--lit-top)]"
-      style={{ ["--i" as string]: index }}
+      style={{ ["--i" as string]: index, ["--reveal-delay" as string]: `${index * 80}ms` }}
     >
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div className="relative aspect-[16/10] overflow-hidden border-b border-edge bg-ink-1 md:aspect-auto md:min-h-[22rem] md:border-b-0 md:border-r">
-          <Image
-            src={project.image1}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover transition-transform duration-[var(--dur-5)]
-              ease-[var(--ease)] group-hover:scale-[1.02]"
-          />
+          {/* Settle lives on the wrapper so the hover scale on the image
+              composes with it instead of being overridden. */}
+          <span className="img-zoom absolute inset-0 block">
+            <Image
+              src={project.image1}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover transition-transform duration-[var(--dur-5)]
+                ease-[var(--ease)] group-hover:scale-[1.02]"
+            />
+          </span>
           {/* Drawn back off the artwork as the card arrives. */}
           <span aria-hidden className="curtain" />
         </div>

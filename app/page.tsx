@@ -1,4 +1,5 @@
 import { ToastProvider } from "./components/Toast";
+import { PageCurtain } from "./components/PageCurtain";
 import { GlobalBackground } from "./components/GlobalBackground";
 import { ScrollAnimations } from "./components/ScrollAnimations";
 import { CustomCursor } from "./components/CustomCursor";
@@ -27,6 +28,7 @@ import { Contact } from "./components/Contact";
 export default function Home() {
   return (
     <ToastProvider>
+      <PageCurtain />
       <GlobalBackground />
       <ScrollAnimations />
       <CustomCursor />

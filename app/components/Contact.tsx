@@ -44,7 +44,9 @@ export const Contact: React.FC = () => {
       id="contact"
       className="relative border-t border-edge px-6 py-[var(--section-y)] md:px-16"
     >
-      <div className="mx-auto max-w-wide">
+      {/* Rises into place as the footer enters — the last thing on the page
+          arrives rather than simply being there. */}
+      <div className="footer-parallax mx-auto max-w-wide">
         <Eyebrow className="reveal mb-6">Contact</Eyebrow>
 
         <h2 className="reveal reveal-split t-display-l max-w-[16ch]">

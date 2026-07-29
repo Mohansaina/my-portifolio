@@ -60,10 +60,19 @@ export const CustomCursor: React.FC = () => {
       if (ringRef.current) ringRef.current.style.opacity = "0";
     };
 
+    // Spring rather than a plain lerp, so the ring carries momentum into a
+    // stop instead of easing to it. Damping is set high enough that it
+    // settles without visible oscillation.
+    let vx = 0;
+    let vy = 0;
+    const stiffness = 0.14;
+    const damping = 0.76;
+
     const render = () => {
-      // Light damping. Enough to read as weight, not enough to lag.
-      ringX += (x - ringX) * 0.16;
-      ringY += (y - ringY) * 0.16;
+      vx = (vx + (x - ringX) * stiffness) * damping;
+      vy = (vy + (y - ringY) * stiffness) * damping;
+      ringX += vx;
+      ringY += vy;
 
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${x - 2}px, ${y - 2}px, 0)`;
@@ -88,14 +97,21 @@ export const CustomCursor: React.FC = () => {
   if (!enabled) return null;
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-[70] select-none">
+    /* `mix-blend-mode: exclusion` inverts whatever sits under the cursor, so
+       it stays visible over the portrait, the code block and the champagne
+       button alike without needing a colour of its own. Exclusion rather than
+       difference: the same behaviour, softer at the midtones. */
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-[70] select-none mix-blend-exclusion"
+    >
       <div
         ref={dotRef}
-        className="fixed left-0 top-0 h-1 w-1 rounded-full bg-lume opacity-0 transition-opacity duration-[var(--dur-3)]"
+        className="fixed left-0 top-0 h-1 w-1 rounded-full bg-white opacity-0 transition-opacity duration-[var(--dur-3)]"
       />
       <div
         ref={ringRef}
-        className="fixed left-0 top-0 h-8 w-8 rounded-full border border-lume-dim opacity-0 transition-opacity duration-[var(--dur-3)]"
+        className="fixed left-0 top-0 h-8 w-8 rounded-full border border-white/70 opacity-0 transition-opacity duration-[var(--dur-3)]"
       />
     </div>
   );

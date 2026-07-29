@@ -52,7 +52,7 @@ export const Timeline: React.FC = () => {
           <li
             key={item.period}
             className="reveal relative pb-12 pl-8 last:pb-0 md:pl-12"
-            style={{ ["--reveal-delay" as string]: `${i * 60}ms` }}
+            style={{ ["--reveal-delay" as string]: `${i * 80}ms` }}
           >
             <span
               aria-hidden

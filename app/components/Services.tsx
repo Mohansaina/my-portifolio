@@ -78,7 +78,7 @@ export const Services: React.FC = () => {
             as="li"
             key={service.title}
             className="reveal facet flex flex-col overflow-hidden p-8"
-            style={{ ["--reveal-delay" as string]: `${i * 60}ms` }}
+            style={{ ["--reveal-delay" as string]: `${i * 80}ms` }}
           >
             <h3 className="t-subheading">{service.title}</h3>
             <p className="mt-1 text-[14px] text-lume/90">{service.summary}</p>

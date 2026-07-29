@@ -997,6 +997,133 @@ img {
 }
 
 /* ============================================================
+   ANIMATION SPEC
+   Hero camera zoom, drifting particles, image settle, magnetic
+   buttons, pinned headers, page curtain, footer parallax.
+   ============================================================ */
+
+/* --- Camera zoom -------------------------------------------
+   The hero settles from slightly long to its resting focal
+   length, once, on load. Reads as a camera finding its subject
+   rather than as an element scaling. */
+.camera-zoom {
+  animation: camera-zoom 900ms var(--ease) both;
+  will-change: transform;
+}
+
+@keyframes camera-zoom {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* --- Particles ---------------------------------------------
+   CSS only. The brief allows "floating particles (minimal)", and
+   the previous canvas implementations were removed for costing
+   thousands of distance calculations per frame. Fourteen drifting
+   spans cost nothing and never touch the main thread. */
+.particle-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--color-lume);
+  opacity: 0;
+  animation: particle-drift linear infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes particle-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  12%,
+  82% {
+    opacity: var(--p-peak, 0.5);
+  }
+  100% {
+    transform: translate3d(var(--p-dx, 24px), -220px, 0);
+    opacity: 0;
+  }
+}
+
+/* --- Image settle ------------------------------------------
+   Artwork arrives slightly long and settles to frame. Lives on a
+   wrapper so the hover scale on the image itself still composes
+   instead of being overridden. */
+.img-zoom {
+  transform: scale(1.2);
+  transition: transform var(--dur-5) var(--ease);
+  transition-delay: calc(var(--reveal-delay, 0ms) + 80ms);
+  will-change: transform;
+}
+
+.is-in .img-zoom {
+  transform: scale(1);
+}
+
+/* --- Magnetic buttons --------------------------------------
+   Offset is written by `useMagnetic`; the transition only governs
+   the release, so the pull tracks the pointer without lag. */
+.magnetic {
+  transition: transform var(--dur-4) var(--ease);
+}
+
+/* --- Pinned section headers --------------------------------
+   Sticky, not hijacked: the page never takes the scroll away, the
+   heading simply holds its place while its own content passes. */
+.pin-header {
+  position: sticky;
+  top: 96px;
+  z-index: 2;
+}
+
+/* --- Page curtain ------------------------------------------ */
+.page-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--color-ink-0);
+  pointer-events: none;
+  animation: curtain-lift var(--dur-5) var(--ease) 120ms both;
+}
+
+@keyframes curtain-lift {
+  to {
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
+/* --- Footer parallax --------------------------------------- */
+@supports (animation-timeline: view()) {
+  .footer-parallax {
+    animation: footer-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 90%;
+  }
+}
+
+@keyframes footer-rise {
+  from {
+    transform: translate3d(0, 48px, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ============================================================
    Production details
    ============================================================ */
 
@@ -1225,13 +1352,14 @@ code ::selection {
 
 /* Delays compose with --reveal-delay, so a staggered row can also be
    sequenced after whatever sits above it. */
+/* Stagger step is 80ms, set once here and reused by every list. */
 .reveal-rows.is-in > *:nth-child(1) { transition-delay: calc(var(--reveal-delay, 0ms)); }
-.reveal-rows.is-in > *:nth-child(2) { transition-delay: calc(var(--reveal-delay, 0ms) + 55ms); }
-.reveal-rows.is-in > *:nth-child(3) { transition-delay: calc(var(--reveal-delay, 0ms) + 110ms); }
-.reveal-rows.is-in > *:nth-child(4) { transition-delay: calc(var(--reveal-delay, 0ms) + 165ms); }
-.reveal-rows.is-in > *:nth-child(5) { transition-delay: calc(var(--reveal-delay, 0ms) + 220ms); }
-.reveal-rows.is-in > *:nth-child(6) { transition-delay: calc(var(--reveal-delay, 0ms) + 275ms); }
-.reveal-rows.is-in > *:nth-child(n + 7) { transition-delay: calc(var(--reveal-delay, 0ms) + 330ms); }
+.reveal-rows.is-in > *:nth-child(2) { transition-delay: calc(var(--reveal-delay, 0ms) + 80ms); }
+.reveal-rows.is-in > *:nth-child(3) { transition-delay: calc(var(--reveal-delay, 0ms) + 160ms); }
+.reveal-rows.is-in > *:nth-child(4) { transition-delay: calc(var(--reveal-delay, 0ms) + 240ms); }
+.reveal-rows.is-in > *:nth-child(5) { transition-delay: calc(var(--reveal-delay, 0ms) + 320ms); }
+.reveal-rows.is-in > *:nth-child(6) { transition-delay: calc(var(--reveal-delay, 0ms) + 400ms); }
+.reveal-rows.is-in > *:nth-child(n + 7) { transition-delay: calc(var(--reveal-delay, 0ms) + 480ms); }
 
 /* --- Sticky work stack -------------------------------------
    Each card pins slightly lower than the one before, so scrolling
@@ -1364,8 +1492,19 @@ code ::selection {
     display: none;
   }
 
-  /* The curtain must clear the image, or the artwork stays hidden. */
-  .curtain {
+  .camera-zoom,
+  .img-zoom,
+  .magnetic,
+  .footer-parallax {
+    animation: none;
+    transform: none;
+  }
+
+  /* Both curtains have to clear entirely, or they leave whatever they
+     cover permanently hidden — the page curtain would blank the site. */
+  .curtain,
+  .page-curtain,
+  .particle-field {
     display: none;
   }
 

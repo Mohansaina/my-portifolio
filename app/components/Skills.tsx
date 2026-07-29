@@ -66,15 +66,15 @@ export const Skills: React.FC = () => {
   useReveal();
 
   return (
-    <Section id="skills" className="border-t border-edge">
-      <SectionHeader eyebrow="Stack" title="What I work with." />
+    <Section id="skills" pin className="border-t border-edge">
+      <SectionHeader eyebrow="Stack" title="What I work with." pinned />
 
       <dl className="grid grid-cols-1 gap-x-16 gap-y-12 sm:grid-cols-2">
         {GROUPS.map((group, i) => (
           <div
             key={group.label}
             className="reveal"
-            style={{ ["--reveal-delay" as string]: `${i * 60}ms` }}
+            style={{ ["--reveal-delay" as string]: `${i * 80}ms` }}
           >
             <dt className="border-b border-edge pb-3">
               <span className="t-label">{group.label}</span>

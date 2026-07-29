@@ -15,6 +15,25 @@ const SPECIALISMS = [
   "AI integration",
 ];
 
+/* Hand-placed rather than randomised: Math.random would produce different
+   values on the server and the client and trip a hydration mismatch. */
+const PARTICLES = [
+  { left: 8, top: 72, dur: 19, delay: 0, dx: 18, peak: 0.5 },
+  { left: 16, top: 88, dur: 24, delay: 3, dx: -14, peak: 0.35 },
+  { left: 24, top: 64, dur: 21, delay: 7, dx: 26, peak: 0.45 },
+  { left: 33, top: 92, dur: 27, delay: 1, dx: -20, peak: 0.3 },
+  { left: 41, top: 76, dur: 18, delay: 9, dx: 12, peak: 0.55 },
+  { left: 49, top: 84, dur: 23, delay: 5, dx: -24, peak: 0.4 },
+  { left: 57, top: 68, dur: 26, delay: 12, dx: 20, peak: 0.35 },
+  { left: 64, top: 90, dur: 20, delay: 2, dx: -16, peak: 0.5 },
+  { left: 72, top: 74, dur: 25, delay: 8, dx: 22, peak: 0.3 },
+  { left: 79, top: 86, dur: 22, delay: 14, dx: -12, peak: 0.45 },
+  { left: 86, top: 70, dur: 28, delay: 4, dx: 16, peak: 0.35 },
+  { left: 92, top: 82, dur: 19, delay: 11, dx: -22, peak: 0.4 },
+  { left: 12, top: 58, dur: 30, delay: 16, dx: 14, peak: 0.25 },
+  { left: 68, top: 56, dur: 29, delay: 6, dx: -18, peak: 0.28 },
+];
+
 /**
  * The hero is the thesis: what he does, for whom, and one lit object.
  *
@@ -116,13 +135,32 @@ export const Hero: React.FC = () => {
       onPointerLeave={onPointerLeave}
       className="relative overflow-hidden px-6 pb-24 pt-40 md:px-16 md:pb-32 md:pt-48"
     >
-      {/* Ambient layer. Both are decorative and never intercept the pointer. */}
+      {/* Ambient layer. All decorative, never intercepts the pointer. */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="hero-grid" />
         <div
           ref={bloomRef}
           className="hero-bloom transition-transform duration-[var(--dur-5)] ease-[var(--ease)] will-change-transform"
         />
+
+        {/* Fourteen drifting motes. Fixed values rather than Math.random, so
+            the server and client render the same markup. */}
+        <div className="particle-field">
+          {PARTICLES.map((p, i) => (
+            <span
+              key={i}
+              className="particle"
+              style={{
+                left: `${p.left}%`,
+                top: `${p.top}%`,
+                animationDuration: `${p.dur}s`,
+                animationDelay: `${p.delay}s`,
+                ["--p-dx" as string]: `${p.dx}px`,
+                ["--p-peak" as string]: p.peak,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="hero-depart relative mx-auto grid max-w-wide grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-12">
@@ -190,6 +228,7 @@ export const Hero: React.FC = () => {
               variant="primary"
               size="lg"
               icon="arrow-right"
+              magnetic
               className="sheen cta-travel !h-14 !px-8 !text-[15px] shadow-[var(--shadow-2)]"
             >
               Start a project
@@ -225,7 +264,10 @@ export const Hero: React.FC = () => {
                   height={860}
                   priority
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="h-full w-full object-cover"
+                  /* Camera zoom lives on the image, not on the frame: the
+                     frame already writes `transform` for parallax, and an
+                     animation on the same property would override it. */
+                  className="camera-zoom h-full w-full object-cover"
                 />
 
                 {/* Key light from above-left. */}

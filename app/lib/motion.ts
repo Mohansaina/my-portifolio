@@ -102,6 +102,64 @@ export function usePointerLight<T extends HTMLElement>() {
 }
 
 /**
+ * Magnetic attraction for important controls.
+ *
+ * The brief allows this for important buttons specifically, so it is opt-in
+ * rather than a default. Pull is capped at `max` px and eased by `strength`,
+ * which keeps it reading as weight rather than as the button running away from
+ * the cursor. Writes are coalesced into one rAF per frame; the release is left
+ * to a CSS transition so letting go settles instead of snapping.
+ */
+export function useMagnetic<T extends HTMLElement>(strength = 0.3, max = 8) {
+  const frame = useRef<number | null>(null);
+  const next = useRef<{ x: number; y: number } | null>(null);
+  const reduced = usePrefersReducedMotion();
+
+  useEffect(
+    () => () => {
+      if (frame.current !== null) cancelAnimationFrame(frame.current);
+    },
+    [],
+  );
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent<T>) => {
+      if (reduced || e.pointerType === "touch") return;
+
+      const el = e.currentTarget;
+      const rect = el.getBoundingClientRect();
+      const dx = (e.clientX - (rect.left + rect.width / 2)) * strength;
+      const dy = (e.clientY - (rect.top + rect.height / 2)) * strength;
+
+      next.current = {
+        x: Math.max(-max, Math.min(max, dx)),
+        y: Math.max(-max, Math.min(max, dy)),
+      };
+
+      if (frame.current !== null) return;
+      frame.current = requestAnimationFrame(() => {
+        frame.current = null;
+        const pos = next.current;
+        if (!pos || !el.isConnected) return;
+        // No transition while tracking, so the pull follows the pointer
+        // exactly; the class transition governs only the release.
+        el.style.transition = "none";
+        el.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, 0)`;
+      });
+    },
+    [reduced, strength, max],
+  );
+
+  const onPointerLeave = useCallback((e: React.PointerEvent<T>) => {
+    const el = e.currentTarget;
+    el.style.transition = "";
+    el.style.transform = "";
+  }, []);
+
+  return { onPointerMove, onPointerLeave };
+}
+
+/**
  * One IntersectionObserver for the entire page, shared by every caller.
  *
  * Sections each call `useReveal()`, and content that mounts later (tab panels,

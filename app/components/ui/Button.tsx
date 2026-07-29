@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Icon, IconName } from "./Icon";
+import { useMagnetic } from "../../lib/motion";
 
 type Variant = "primary" | "secondary" | "ghost";
 type Size = "md" | "lg";
@@ -37,6 +38,8 @@ interface CommonProps {
   variant?: Variant;
   size?: Size;
   icon?: IconName;
+  /** Opt-in pointer attraction. Reserved for the page's important actions. */
+  magnetic?: boolean;
   className?: string;
   children: React.ReactNode;
 }
@@ -59,26 +62,44 @@ export const Button: React.FC<ButtonProps> = ({
   variant = "secondary",
   size = "md",
   icon,
+  magnetic = false,
   className = "",
   children,
   ...rest
-}) => (
-  <button className={classes(variant, size, className)} {...rest}>
-    {children}
-    {icon && <Icon name={icon} size={15} />}
-  </button>
-);
+}) => {
+  const pull = useMagnetic<HTMLButtonElement>();
+
+  return (
+    <button
+      className={classes(variant, size, `${magnetic ? "magnetic" : ""} ${className}`)}
+      {...(magnetic ? pull : {})}
+      {...rest}
+    >
+      {children}
+      {icon && <Icon name={icon} size={15} />}
+    </button>
+  );
+};
 
 export const ButtonLink: React.FC<LinkProps> = ({
   variant = "secondary",
   size = "md",
   icon,
+  magnetic = false,
   className = "",
   children,
   ...rest
-}) => (
-  <a className={classes(variant, size, className)} {...rest}>
-    {children}
-    {icon && <Icon name={icon} size={15} />}
-  </a>
-);
+}) => {
+  const pull = useMagnetic<HTMLAnchorElement>();
+
+  return (
+    <a
+      className={classes(variant, size, `${magnetic ? "magnetic" : ""} ${className}`)}
+      {...(magnetic ? pull : {})}
+      {...rest}
+    >
+      {children}
+      {icon && <Icon name={icon} size={15} />}
+    </a>
+  );
+};
