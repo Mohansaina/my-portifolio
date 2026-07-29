@@ -76,7 +76,7 @@ export const ScrollAnimations: React.FC = () => {
           })
         }
         aria-label="Back to top"
-        className={`lit surface fixed bottom-8 right-8 z-40 grid h-11 w-11 place-items-center
+        className={`lit surface inset-safe-b inset-safe-r fixed z-40 grid h-11 w-11 place-items-center
           rounded-md text-text-mid transition-[opacity,transform,color,background-color,border-color]
           duration-[var(--dur-3)] ease-[var(--ease)] hover:bg-ink-3 hover:text-text-hi
           ${

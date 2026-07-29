@@ -269,7 +269,7 @@ const PaletteDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           id="palette-list"
           role="listbox"
           aria-label="Commands"
-          className="max-h-[46vh] overflow-y-auto p-2"
+          className="scroll-shadow max-h-[46vh] overflow-y-auto p-2"
         >
           {results.length === 0 && (
             <li className="px-3 py-8 text-center text-[13px] text-text-lo">
@@ -357,9 +357,9 @@ const PaletteHint: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
       type="button"
       onClick={onOpen}
       aria-haspopup="dialog"
-      className="lit surface fixed bottom-8 left-8 z-40 hidden items-center gap-2 rounded-md
-        px-3 py-2 text-[12px] text-text-lo transition-colors duration-[var(--dur-2)]
-        hover:text-text-hi md:inline-flex"
+      className="lit surface inset-safe-b inset-safe-l fixed z-40 hidden items-center gap-2
+        rounded-md px-3 py-2 text-[12px] text-text-lo transition-colors
+        duration-[var(--dur-2)] hover:text-text-hi active:translate-y-px md:inline-flex"
     >
       <span>Quick nav</span>
       <kbd className="t-mono rounded-xs border border-edge px-1.5 !text-[11px]">

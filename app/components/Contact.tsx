@@ -69,12 +69,18 @@ export const Contact: React.FC = () => {
           <button
             type="button"
             onClick={copyEmail}
-            className="inline-flex shrink-0 cursor-pointer items-center gap-2 self-start rounded-md
-              border border-edge px-4 py-2.5 text-[13px] text-text-mid transition-colors
-              duration-[var(--dur-2)] hover:border-edge-hi hover:text-text-hi sm:self-auto"
+            className="inline-flex h-11 shrink-0 cursor-pointer items-center gap-2 self-start
+              rounded-md border border-edge px-4 text-[13px] text-text-mid
+              transition-[color,border-color,background-color,transform] duration-[var(--dur-2)]
+              hover:border-edge-hi hover:bg-ink-2 hover:text-text-hi
+              active:translate-y-px sm:self-auto"
           >
             <Icon name={copied ? "check" : "copy"} size={14} />
-            {copied ? "Copied" : "Copy address"}
+            {/* Fixed width across both labels so the button does not resize
+                under the cursor at the moment it is clicked. */}
+            <span className="w-[6.5rem] text-left">
+              {copied ? "Copied" : "Copy address"}
+            </span>
           </button>
         </div>
 
@@ -85,8 +91,9 @@ export const Contact: React.FC = () => {
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xs text-[14px] text-text-lo
-                  transition-colors duration-[var(--dur-2)] hover:text-text-hi"
+                className="-mx-2 inline-flex h-11 items-center gap-2 rounded-sm px-2
+                  text-[14px] text-text-lo transition-colors duration-[var(--dur-2)]
+                  hover:text-text-hi active:translate-y-px"
               >
                 <Icon name={social.icon as IconName} size={15} />
                 {social.label}

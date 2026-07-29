@@ -198,7 +198,8 @@ const ProjectCard: React.FC<{
               <button
                 type="button"
                 onClick={onOpen}
-                className="cursor-pointer text-left after:absolute after:inset-0 after:content-['']"
+                className="stretch-target cursor-pointer text-left after:absolute
+                  after:inset-0 after:content-['']"
               >
                 {project.title}
                 <span className="sr-only"> — view case study</span>
@@ -235,8 +236,9 @@ const ProjectCard: React.FC<{
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${project.title} — open live site`}
-            className="grid h-8 w-8 place-items-center rounded-xs text-text-lo
-              transition-colors duration-[var(--dur-2)] hover:text-text-hi"
+            className="grid h-10 w-10 place-items-center rounded-sm text-text-lo
+              transition-colors duration-[var(--dur-2)] hover:bg-ink-3
+              hover:text-text-hi active:translate-y-px"
           >
             <Icon name="arrow-up-right" size={15} />
           </a>
@@ -245,8 +247,9 @@ const ProjectCard: React.FC<{
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${project.title} — view source`}
-            className="grid h-8 w-8 place-items-center rounded-xs text-text-lo
-              transition-colors duration-[var(--dur-2)] hover:text-text-hi"
+            className="grid h-10 w-10 place-items-center rounded-sm text-text-lo
+              transition-colors duration-[var(--dur-2)] hover:bg-ink-3
+              hover:text-text-hi active:translate-y-px"
           >
             <Icon name="github" size={15} />
           </a>

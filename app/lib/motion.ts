@@ -212,7 +212,13 @@ export function useModal(open: boolean, onClose: () => void) {
     const prevPadding = body.style.paddingRight;
 
     body.style.overflow = "hidden";
-    if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+    if (scrollbar > 0) {
+      body.style.paddingRight = `${scrollbar}px`;
+      // Padding on <body> cannot move a position: fixed element, so the
+      // navbar would slide sideways as the scrollbar disappears. Publish the
+      // width for fixed chrome to compensate with.
+      documentElement.style.setProperty("--scroll-lock-pad", `${scrollbar}px`);
+    }
 
     const FOCUSABLE =
       'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])';
@@ -255,6 +261,7 @@ export function useModal(open: boolean, onClose: () => void) {
       document.removeEventListener("keydown", onKeyDown);
       body.style.overflow = prevOverflow;
       body.style.paddingRight = prevPadding;
+      documentElement.style.removeProperty("--scroll-lock-pad");
       opener?.focus?.();
     };
   }, [open, onClose]);

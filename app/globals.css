@@ -115,6 +115,20 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+
+  /* Mobile browsers paint a grey box over anything tapped. Focus-visible
+     and the press states below carry that job properly. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Avoid a single trailing word on its own line. Progressive: browsers
+   without it simply wrap as before. */
+p,
+li,
+blockquote,
+figcaption,
+dd {
+  text-wrap: pretty;
 }
 
 ::selection {
@@ -122,16 +136,34 @@ body {
   color: var(--color-text-hi);
 }
 
-/* Focus: one beautiful indicator, everywhere. */
+/* Focus: one indicator, everywhere. The outline follows the element's
+   own border-radius automatically. */
 :focus-visible {
   outline: 2px solid var(--color-lume);
   outline-offset: 2px;
-  border-radius: inherit;
 }
 
 /* Only ever hide the default ring when :focus-visible replaces it. */
 :focus:not(:focus-visible) {
   outline: none;
+}
+
+/* The caret should belong to the palette, not to the browser. */
+input,
+textarea {
+  caret-color: var(--color-lume);
+}
+
+/* Links carry a thin rule that sits clear of the descenders. */
+a {
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+}
+
+/* Images are content, not draggable furniture. */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 ::-webkit-scrollbar {
@@ -264,9 +296,15 @@ body {
   transition: opacity var(--dur-3) var(--ease);
 }
 
-.lit:hover::before,
+/* Keyboard users get the same light as pointer users. */
 .lit:focus-within::before {
   opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lit:hover::before {
+    opacity: 1;
+  }
 }
 
 /* ============================================================
@@ -285,12 +323,40 @@ body {
 }
 
 /* Cards lift gently. The brief caps scale at 1.02; a 2px rise
-   plus a deeper shadow reads as lift without any scaling. */
-.surface-raise:hover {
-  background: var(--color-ink-3);
-  border-color: var(--color-edge-hi);
-  box-shadow: var(--shadow-2), var(--lit-top);
-  transform: translate3d(0, -2px, 0);
+   plus a deeper shadow reads as lift without any scaling.
+
+   Gated on a real hovering pointer: on touch, :hover latches after
+   a tap and the card stays lifted until you touch something else. */
+@media (hover: hover) and (pointer: fine) {
+  .surface-raise:hover {
+    background: var(--color-ink-3);
+    border-color: var(--color-edge-hi);
+    box-shadow: var(--shadow-2), var(--lit-top);
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+/* Press. The brief asks for "subtle press" and fast feedback — the
+   surface settles back to the page under your finger. */
+.surface-raise:active {
+  transform: translate3d(0, 0, 0);
+  box-shadow: var(--shadow-1), var(--lit-top);
+  transition-duration: var(--dur-1);
+}
+
+/* A stretched link puts the control on a few words of heading, so the
+   focus ring would draw around the title while the whole card is the
+   target. Move the ring to the card.
+
+   Scoped to the work deck deliberately: applying this to every .surface
+   would ring the whole command palette when its search input is focused. */
+.stack-item:has(.stretch-target:focus-visible) {
+  outline: 2px solid var(--color-lume);
+  outline-offset: 3px;
+}
+
+.stack-item .stretch-target:focus-visible {
+  outline: none;
 }
 
 /* Glass exists only to separate layers. */
@@ -524,8 +590,10 @@ body {
   will-change: transform;
 }
 
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
+@media (hover: hover) and (pointer: fine) {
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
 }
 
 @keyframes marquee-scroll {
@@ -534,6 +602,136 @@ body {
   }
   to {
     transform: translate3d(-100%, 0, 0);
+  }
+}
+
+/* ============================================================
+   Production details
+   ============================================================ */
+
+/* Fixed chrome must clear the notch and the home indicator, or it
+   sits underneath them on an iPhone. Falls back to 0 everywhere
+   else, so the normal offset is unaffected. */
+.inset-safe-b {
+  bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+}
+.inset-safe-l {
+  left: calc(32px + env(safe-area-inset-left, 0px));
+}
+.inset-safe-r {
+  right: calc(32px + env(safe-area-inset-right, 0px));
+}
+
+/* Locking the page behind a modal removes the scrollbar and the
+   layout jumps sideways. `useModal` measures the scrollbar and
+   publishes it here so fixed chrome can compensate too — padding
+   on <body> alone never reaches position: fixed elements. */
+.scroll-lock-aware {
+  right: var(--scroll-lock-pad, 0px);
+}
+
+/* Shadows that appear only when there is more to scroll to.
+   Purely CSS: the `local` layers scroll with the content and cover
+   the `scroll` layers when you are at either end. */
+.scroll-shadow {
+  /* Must match the surface underneath or the cover layers band.
+     Override with --scroll-bg on a differently-toned panel. */
+  --scroll-bg: var(--color-ink-2);
+  --scroll-bg-fade: rgba(22, 24, 28, 0);
+
+  background:
+    linear-gradient(var(--scroll-bg) 30%, var(--scroll-bg-fade)) top / 100% 28px
+      no-repeat local,
+    linear-gradient(var(--scroll-bg-fade), var(--scroll-bg) 70%) bottom / 100%
+      28px no-repeat local,
+    radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.45), transparent)
+      top / 100% 12px no-repeat scroll,
+    radial-gradient(
+        farthest-side at 50% 100%,
+        rgba(0, 0, 0, 0.45),
+        transparent
+      )
+      bottom / 100% 12px no-repeat scroll;
+}
+
+/* Code keeps its own selection colour so highlighted source stays
+   legible against the warmer page selection. */
+pre ::selection,
+code ::selection {
+  background: rgba(232, 217, 184, 0.28);
+  color: #fff;
+}
+
+/* ============================================================
+   Print — someone will put this in front of a hiring manager on
+   paper. Drop the furniture, invert to ink on white, and reveal
+   the destination of every link.
+   ============================================================ */
+
+@media print {
+  :root {
+    --section-y: 24px;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  .os-background-canvas,
+  .grain,
+  .aura,
+  .marquee,
+  nav,
+  header[class*="fixed"],
+  [role="dialog"],
+  [aria-haspopup="dialog"],
+  button[aria-label="Back to top"] {
+    display: none !important;
+  }
+
+  .t-display-xl,
+  .t-display-l,
+  .t-heading,
+  .t-subheading,
+  h1,
+  h2,
+  h3 {
+    color: #000 !important;
+    page-break-after: avoid;
+  }
+
+  .t-body,
+  .t-body-l,
+  .t-label,
+  .t-mono,
+  p,
+  li {
+    color: #222 !important;
+  }
+
+  .surface,
+  .lit {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  /* Pinning makes cards overlap on paper. */
+  .stack-item {
+    position: static !important;
+  }
+
+  section,
+  footer {
+    page-break-inside: avoid;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
   }
 }
 
@@ -645,9 +843,15 @@ body {
    deals them into a deck. Depth comes from the offset and the
    shadow, not from perspective tricks. */
 
-.stack-item {
-  position: sticky;
-  top: calc(96px + var(--i, 0) * 16px);
+/* Pinning is only safe once a card is comfortably shorter than the
+   viewport. On a phone the card is taller than the screen, so pinning
+   it would hold its own lower half permanently out of reach. Below the
+   breakpoint the deck is simply a stack. */
+@media (min-width: 768px) and (min-height: 640px) {
+  .stack-item {
+    position: sticky;
+    top: calc(96px + var(--i, 0) * 16px);
+  }
 }
 
 /* --- Scroll-linked rail ------------------------------------

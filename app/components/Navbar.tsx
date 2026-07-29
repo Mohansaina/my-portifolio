@@ -79,9 +79,23 @@ export const Navbar: React.FC = () => {
       return;
     }
 
+    // First placement happens with transitions suppressed, otherwise the
+    // marker visibly slides in from the left edge on load instead of simply
+    // being where it belongs.
+    const isFirst = marker.dataset.placed !== "true";
+    if (isFirst) marker.style.transition = "none";
+
     marker.style.opacity = "1";
     marker.style.width = `${current.offsetWidth}px`;
     marker.style.transform = `translate3d(${current.offsetLeft}px, 0, 0)`;
+
+    if (isFirst) {
+      // Read back a layout value so the jump is committed before the
+      // transition is restored.
+      void marker.offsetWidth;
+      marker.style.transition = "";
+      marker.dataset.placed = "true";
+    }
   }, [active]);
 
   useEffect(() => {
@@ -115,7 +129,7 @@ export const Navbar: React.FC = () => {
       </a>
 
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-[var(--dur-3)] ease-[var(--ease)]
+        className={`scroll-lock-aware fixed inset-x-0 top-0 z-50 transition-colors duration-[var(--dur-3)] ease-[var(--ease)]
           ${scrolled ? "glass border-b border-edge" : "border-b border-transparent"}`}
       >
         <nav

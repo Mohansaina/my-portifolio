@@ -222,7 +222,8 @@ export const CodePlayground: React.FC = () => {
           id="code-panel"
           role="tabpanel"
           tabIndex={0}
-          className="max-h-[28rem] overflow-auto"
+          className="scroll-shadow max-h-[28rem] overflow-auto
+            [--scroll-bg-fade:rgba(16,17,20,0)] [--scroll-bg:var(--color-ink-1)]"
         >
           <pre className="min-w-max py-4 font-mono text-[12.5px] leading-[1.7]">
             <code>
