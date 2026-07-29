@@ -59,8 +59,8 @@ export const Contact: React.FC = () => {
         <div className="reveal mt-12 flex flex-col gap-4 border-y border-edge py-8 sm:flex-row sm:items-center sm:justify-between">
           <a
             href={`mailto:${EMAIL}`}
-            className="font-display text-[clamp(22px,4vw,44px)] font-medium tracking-[-0.02em]
-              text-text-hi underline decoration-edge-hi underline-offset-[10px]
+            className="font-editorial text-[clamp(23px,4vw,46px)] tracking-[-0.012em]
+              text-text-hi underline decoration-edge-hi underline-offset-[12px]
               transition-colors duration-[var(--dur-2)] hover:decoration-lume"
           >
             {EMAIL}

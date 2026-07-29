@@ -48,7 +48,9 @@ export const Testimonials: React.FC = () => {
             style={{ ["--reveal-delay" as string]: `${i * 60}ms` }}
           >
             <figure>
-              <blockquote className="font-display text-[19px] font-normal leading-[1.5] tracking-[-0.01em] text-text-hi">
+              {/* Pulled up to 21px: the serif needs the size to keep its
+                  hairlines from thinning out. */}
+              <blockquote className="font-editorial text-[21px] leading-[1.45] tracking-[-0.008em] text-text-hi">
                 &ldquo;{item.quote}&rdquo;
               </blockquote>
               <figcaption className="mt-6 border-t border-edge pt-4">

@@ -47,7 +47,13 @@
   --container-narrow: 880px;
   --container-wide: 1200px;
 
-  /* --- Type ----------------------------------------------- */
+  /* --- Type -----------------------------------------------
+     Three voices. `editorial` states things, `display` labels the
+     interface, `mono` carries data. The serif is reserved for
+     statement sizes; below roughly 22px its hairlines thin out and
+     it starts to look frail rather than fine. */
+  --font-editorial: var(--font-instrument-serif), "Times New Roman", Georgia,
+    serif;
   --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
@@ -186,32 +192,36 @@ img {
    Type scale
    ============================================================ */
 
+/* Statement sizes, set in the editorial serif. Weight stays at 400
+   throughout: the face ships one weight, and a synthesised bold would
+   thicken exactly the hairlines that make it worth using. Tracking is
+   looser than the grotesque wanted — a high-contrast serif needs its
+   counters left alone. */
+
 .t-display-xl {
-  font-family: var(--font-display);
-  font-size: clamp(48px, 8vw, 104px);
-  font-weight: 500;
-  font-variation-settings: "wdth" 94;
-  letter-spacing: -0.03em;
-  line-height: 0.98;
+  font-family: var(--font-editorial);
+  font-size: clamp(46px, 7.6vw, 108px);
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  line-height: 1;
   color: var(--color-text-hi);
 }
 
 .t-display-l {
-  font-family: var(--font-display);
-  font-size: clamp(36px, 5vw, 60px);
-  font-weight: 500;
-  font-variation-settings: "wdth" 96;
-  letter-spacing: -0.025em;
-  line-height: 1.05;
+  font-family: var(--font-editorial);
+  font-size: clamp(34px, 4.8vw, 62px);
+  font-weight: 400;
+  letter-spacing: -0.014em;
+  line-height: 1.08;
   color: var(--color-text-hi);
 }
 
 .t-heading {
-  font-family: var(--font-display);
-  font-size: clamp(22px, 2.5vw, 30px);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  line-height: 1.25;
+  font-family: var(--font-editorial);
+  font-size: clamp(23px, 2.5vw, 31px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.22;
   color: var(--color-text-hi);
 }
 

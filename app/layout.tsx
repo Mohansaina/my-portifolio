@@ -1,9 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import {
+  Archivo,
+  Instrument_Sans,
+  Instrument_Serif,
+  JetBrains_Mono,
+} from "next/font/google";
 import { site } from "./lib/site";
 import "./globals.css";
 
-// Display. Personality comes from optical width and size, not weight.
+/**
+ * Editorial. A high-contrast serif for anything that makes a statement.
+ *
+ * The thick-to-thin stroke contrast is what reads as expensive against a
+ * near-black page, and it is the native letterform of the luxury retail market
+ * the jewelry work sells into. One weight only, by design: you do not embolden
+ * a face like this — size carries the emphasis, and a synthesised bold would
+ * thicken the hairlines that make it work.
+ */
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+// UI headings and the wordmark. Kept for anything below statement size, where
+// a display serif turns fragile.
 const archivo = Archivo({
   variable: "--font-archivo",
   subsets: ["latin"],
@@ -127,7 +150,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${instrumentSans.variable} ${jetbrainsMono.variable}`}
+      className={`${instrumentSerif.variable} ${archivo.variable} ${instrumentSans.variable} ${jetbrainsMono.variable}`}
     >
       <body className="bg-ink-0 text-text-mid">
         {children}

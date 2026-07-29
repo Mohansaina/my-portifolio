@@ -77,7 +77,7 @@ export const Proof: React.FC = () => {
 const FactItem: React.FC<{ fact: Fact }> = ({ fact }) => {
   const body = (
     <>
-      <p className="font-display text-4xl font-medium tracking-tight tabular-nums text-text-hi md:text-5xl">
+      <p className="font-editorial text-[40px] tabular-nums leading-none tracking-[-0.015em] text-text-hi md:text-[52px]">
         <FactValue fact={fact} />
         {fact.suffix}
       </p>
