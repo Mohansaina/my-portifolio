@@ -18,6 +18,7 @@ import { useReveal } from "../lib/motion";
 export const ScrollAnimations: React.FC = () => {
   const [showTop, setShowTop] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLButtonElement>(null);
 
   useReveal();
 
@@ -29,10 +30,10 @@ export const ScrollAnimations: React.FC = () => {
       const max =
         document.documentElement.scrollHeight - window.innerHeight;
       const progress = max > 0 ? window.scrollY / max : 0;
-      barRef.current?.style.setProperty(
-        "transform",
-        `scaleX(${progress.toFixed(4)})`,
-      );
+      const p = progress.toFixed(4);
+      barRef.current?.style.setProperty("transform", `scaleX(${p})`);
+      // Same number, second readout: the ring around the back-to-top control.
+      topRef.current?.style.setProperty("--sp", p);
       setShowTop(window.scrollY > 600);
     };
 
@@ -65,6 +66,7 @@ export const ScrollAnimations: React.FC = () => {
       </div>
 
       <button
+        ref={topRef}
         type="button"
         onClick={() =>
           window.scrollTo({
@@ -76,8 +78,8 @@ export const ScrollAnimations: React.FC = () => {
           })
         }
         aria-label="Back to top"
-        className={`lit surface inset-safe-b inset-safe-r fixed z-40 grid h-11 w-11 place-items-center
-          rounded-md text-text-mid transition-[opacity,transform,color,background-color,border-color]
+        className={`surface inset-safe-b inset-safe-r fixed z-40 grid h-11 w-11 place-items-center
+          rounded-full text-text-mid transition-[opacity,transform,color,background-color,border-color]
           duration-[var(--dur-3)] ease-[var(--ease)] hover:bg-ink-3 hover:text-text-hi
           ${
             showTop
@@ -85,6 +87,8 @@ export const ScrollAnimations: React.FC = () => {
               : "pointer-events-none translate-y-2 opacity-0"
           }`}
       >
+        {/* How far through the page you are, read a second way. */}
+        <span aria-hidden className="progress-ring" />
         <Icon name="arrow-up" size={16} />
       </button>
     </>

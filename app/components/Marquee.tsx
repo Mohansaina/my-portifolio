@@ -51,13 +51,18 @@ const Row = () => (
  * twenty-eight duplicated list items.
  */
 export const Marquee: React.FC = () => (
-  <div aria-hidden className="relative border-y border-edge py-5 select-none">
-    <div className="marquee">
-      <div className="marquee-track">
-        <Row />
-      </div>
-      <div className="marquee-track">
-        <Row />
+  <div aria-hidden className="relative select-none overflow-hidden border-y border-edge py-5">
+    {/* Eases along with the scroll on top of its own constant travel. Two
+        timelines cannot compose on one element, so the drift sits here and
+        the loop stays on the tracks. */}
+    <div className="marquee-drift">
+      <div className="marquee">
+        <div className="marquee-track">
+          <Row />
+        </div>
+        <div className="marquee-track">
+          <Row />
+        </div>
       </div>
     </div>
   </div>

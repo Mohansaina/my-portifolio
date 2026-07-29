@@ -183,6 +183,8 @@ const ProjectCard: React.FC<{
             className="object-cover transition-transform duration-[var(--dur-5)]
               ease-[var(--ease)] group-hover:scale-[1.02]"
           />
+          {/* Drawn back off the artwork as the card arrives. */}
+          <span aria-hidden className="curtain" />
         </div>
 
         <div className="flex flex-col justify-between p-8 md:p-10">

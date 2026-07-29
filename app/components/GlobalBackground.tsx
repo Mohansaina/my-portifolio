@@ -61,15 +61,16 @@ export const GlobalBackground: React.FC = () => {
       aria-hidden
       className="os-background-canvas"
     >
-      {/* 1. Top-Center Studio & Hero Focal Glow */}
-      <div className="os-hero-glow" />
+      {/* 1. Top-Center Studio & Hero Focal Glow
+             On its own parallax layer: the canvas is position: fixed, so
+             without this the backdrop has no relationship to scrolling at
+             all. The drift sits on the wrapper because the glow already
+             uses transform to centre itself, and a second animation on the
+             same property would override that rather than compose with it. */}
+      <div className="bg-drift absolute inset-0">
+        <div className="os-hero-glow" />
+      </div>
 
-      {/* 2. Slow Drifting Ambient Mesh Layer */}
-      <div className="os-ambient-blob-1" />
-      <div className="os-ambient-blob-2" />
-
-      {/* 3. Fine Raster Dot Matrix Layer */}
-      <div className="os-dot-matrix" />
 
       {/* 4. Studio Edge Vignette */}
       <div className="os-vignette" />

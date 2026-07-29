@@ -807,6 +807,105 @@ img {
 }
 
 /* ============================================================
+   SCENE MOTION
+   Continuous, scroll-linked effects. All of these use native
+   scroll-driven animation, which the compositor runs on its own
+   thread — no scroll listener, no layout work, and no cost when
+   the section is off screen. Browsers without support get the
+   static end state and lose nothing but the flourish.
+   ============================================================ */
+
+/* Sections recede as you leave them. Arrival is still handled by
+   the IntersectionObserver reveal, so the two never fight over
+   the same property at the same time. */
+@supports (animation-timeline: view()) {
+  .scene {
+    animation: scene-exit linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 80%;
+  }
+
+  /* The background drifts against the page. It is position: fixed,
+     so this parallax is the only thing that gives the backdrop any
+     relationship to scrolling at all. */
+  .bg-drift {
+    animation: bg-drift linear both;
+    animation-timeline: scroll(root);
+  }
+
+  /* The ticker eases along with the scroll on top of its own
+     constant travel. Two timelines cannot compose on one element,
+     so the drift lives on the wrapper and the loop on the track. */
+  .marquee-drift {
+    animation: marquee-drift linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes scene-exit {
+  to {
+    opacity: 0.4;
+    transform: translate3d(0, -24px, 0) scale(0.992);
+  }
+}
+
+@keyframes bg-drift {
+  to {
+    transform: translate3d(0, -80px, 0);
+  }
+}
+
+@keyframes marquee-drift {
+  from {
+    transform: translate3d(-32px, 0, 0);
+  }
+  to {
+    transform: translate3d(32px, 0, 0);
+  }
+}
+
+/* A curtain drawn back off the image, rather than a fade. Transform
+   only, so it composites; the panel is opaque, so nothing underneath
+   is visible until it clears. */
+.curtain {
+  position: absolute;
+  inset: -1px;
+  z-index: 1;
+  background: var(--color-ink-1);
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--dur-5) var(--ease);
+  transition-delay: calc(var(--reveal-delay, 0ms) + 80ms);
+  pointer-events: none;
+}
+
+.is-in .curtain {
+  transform: translate3d(0, -101%, 0);
+}
+
+/* Scroll progress, drawn as a ring around the back-to-top control.
+   --sp is published by ScrollAnimations inside its existing rAF. */
+.progress-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    var(--color-lume) calc(var(--sp, 0) * 360deg),
+    rgba(255, 255, 255, 0.09) 0
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 2px),
+    #000 calc(100% - 2px)
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 2px),
+    #000 calc(100% - 2px)
+  );
+}
+
+/* ============================================================
    Production details
    ============================================================ */
 
@@ -1160,10 +1259,18 @@ code ::selection {
     transform: none;
   }
 
-  .hero-depart {
+  .hero-depart,
+  .scene,
+  .bg-drift,
+  .marquee-drift {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  /* The curtain must clear the image, or the artwork stays hidden. */
+  .curtain {
+    display: none;
   }
 
   .sheen::after,

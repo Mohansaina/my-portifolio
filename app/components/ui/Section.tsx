@@ -25,8 +25,10 @@ export const Section: React.FC<SectionProps> = ({
     className={`relative px-6 md:px-16 py-[var(--section-y)] ${className}`}
     {...rest}
   >
+    {/* `scene` handles the section's departure only — arrival stays with the
+        reveal observer, so the two never animate the same property at once. */}
     <div
-      className={`mx-auto w-full ${
+      className={`scene mx-auto w-full ${
         width === "narrow" ? "max-w-narrow" : "max-w-wide"
       }`}
     >
