@@ -855,6 +855,87 @@ img {
   }
 }
 
+/* ------------------------------------------------------------
+   The key light walks the room.
+   The palette is built on jewelry photography — a warm key, a
+   cool fill, one light source. This makes that literal: scrolling
+   moves the light across the set rather than moving a lit page
+   past a fixed lamp. Every surface's `.lit` edge, every top
+   highlight and every shadow already answers to that same light,
+   so the whole page reads as one room being walked through.
+   ------------------------------------------------------------ */
+
+.studio-key {
+  position: absolute;
+  top: -20vh;
+  left: 50%;
+  width: min(120vw, 1500px);
+  height: 80vh;
+  margin-left: min(-60vw, -750px);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    rgba(232, 217, 184, 0.09) 0%,
+    rgba(232, 217, 184, 0.035) 42%,
+    transparent 72%
+  );
+}
+
+@supports (animation-timeline: scroll()) {
+  .studio-key {
+    animation: light-walk linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes light-walk {
+  0% {
+    transform: translate3d(-10vw, 0, 0);
+    opacity: 0.55;
+  }
+  30% {
+    transform: translate3d(12vw, 26vh, 0);
+    opacity: 1;
+  }
+  65% {
+    transform: translate3d(-10vw, 52vh, 0);
+    opacity: 0.72;
+  }
+  100% {
+    transform: translate3d(8vw, 74vh, 0);
+    opacity: 0.5;
+  }
+}
+
+/* Light catching a cut surface. The jewelry work is the reason the
+   whole system is lit this way, so the cards that sell it behave
+   like stones under a lamp rather than like buttons. Slower and far
+   dimmer than the CTA sheen — this is a surface, not a control. */
+.facet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 40%,
+    rgba(232, 217, 184, 0.11) 50%,
+    transparent 60%
+  );
+  transform: translate3d(-125%, 0, 0);
+  transition: transform var(--dur-5) var(--ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .facet:hover::after,
+  .facet:focus-within::after {
+    transform: translate3d(125%, 0, 0);
+  }
+}
+
 @keyframes marquee-drift {
   from {
     transform: translate3d(-32px, 0, 0);
@@ -1262,10 +1343,15 @@ code ::selection {
   .hero-depart,
   .scene,
   .bg-drift,
-  .marquee-drift {
+  .marquee-drift,
+  .studio-key {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  .facet::after {
+    display: none;
   }
 
   /* The curtain must clear the image, or the artwork stays hidden. */

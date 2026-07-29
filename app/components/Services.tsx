@@ -71,10 +71,13 @@ export const Services: React.FC = () => {
 
       <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {SERVICES.map((service, i) => (
+          /* `facet`: these are the cards that sell the jewelry work, so they
+             catch light like a cut surface rather than lighting up like a
+             control. */
           <Card
             as="li"
             key={service.title}
-            className="reveal flex flex-col p-8"
+            className="reveal facet flex flex-col overflow-hidden p-8"
             style={{ ["--reveal-delay" as string]: `${i * 60}ms` }}
           >
             <h3 className="t-subheading">{service.title}</h3>

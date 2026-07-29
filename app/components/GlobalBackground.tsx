@@ -71,6 +71,13 @@ export const GlobalBackground: React.FC = () => {
         <div className="os-hero-glow" />
       </div>
 
+      {/* The key light walks the set as you scroll, rather than the page
+          sliding past a fixed lamp. This is the jewelry-photography model the
+          whole palette is built on, made literal — and because every `.lit`
+          edge, top highlight and shadow already answers to the same source,
+          the page reads as one room being walked through. */}
+      <div className="studio-key" />
+
 
       {/* 4. Studio Edge Vignette */}
       <div className="os-vignette" />
