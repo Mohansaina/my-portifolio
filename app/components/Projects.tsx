@@ -9,6 +9,36 @@ import { ProjectModal, ProjectData } from "./ProjectModal";
 
 const PROJECTS: ProjectData[] = [
   {
+    id: "jdjewells",
+    title: "J&D Jewellers",
+    category: "Fine jewellery · full-stack",
+    year: "2026",
+    description:
+      "A London jeweller's storefront: a six-step ring configurator, a certified diamond vault and checkout.",
+    problem:
+      "A bespoke jeweller sells pieces that get configured rather than picked off a shelf — metal, setting, stone, size. A catalogue with a buy button cannot represent that, so every order falls back to email and stalls at the point where the customer is ready to pay.",
+    solution:
+      "A full storefront on Next.js and Postgres. A six-step configurator prices the ring as it is assembled, a 4Cs filter searches loose-diamond inventory against GIA certificates, and the chosen stone carries straight through cart, checkout and order tracking.",
+    features: [
+      "Six-step ring configurator with a live cost summary",
+      "Loose-diamond search on carat, cut, colour and clarity",
+      "Prisma and Postgres behind the product, order and review APIs",
+      "Accounts, cart, checkout and order tracking",
+    ],
+    techStack: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS v4",
+      "Prisma",
+      "PostgreSQL",
+    ],
+    demoUrl: "https://jdjewells.vercel.app",
+    repoUrl: "https://github.com/Mohansaina/jdjewells",
+    image1: "/jdjewells_storefront.jpg",
+    image2: "/jdjewells_configurator.png",
+  },
+  {
     id: "aurajewels",
     title: "AuraJewels",
     category: "Luxury e-commerce",

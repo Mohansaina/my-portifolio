@@ -14,9 +14,13 @@ import { useCountUp, useReveal } from "../lib/motion";
  * faith.
  *
  * Deliberately no "projects completed" or "happy clients" counts. Those were
- * previously asserted further down the page at 15+ and 10+ alongside four
- * shown projects, and an unverifiable number sitting next to visible evidence
- * that contradicts it costs more credibility than it buys.
+ * previously asserted further down the page at 15+ and 10+ alongside the
+ * projects actually shown, and an unverifiable number sitting next to visible
+ * evidence that contradicts it costs more credibility than it buys.
+ *
+ * The two counts below are literal: they must match the number of PROJECTS
+ * entries in Projects.tsx carrying a demoUrl and a repoUrl. Adding a project
+ * means updating them.
  */
 interface Fact {
   value: number | string;
@@ -29,14 +33,14 @@ interface Fact {
 
 const FACTS: Fact[] = [
   {
-    value: 3,
+    value: 4,
     label: "Live products",
     detail: "Running in public, not mockups",
     href: "#work",
     icon: "arrow-right",
   },
   {
-    value: 3,
+    value: 4,
     label: "Public repositories",
     detail: "Read the source before you call",
     href: "https://github.com/Mohansaina",
