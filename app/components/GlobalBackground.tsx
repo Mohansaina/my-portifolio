@@ -26,33 +26,44 @@ export const GlobalBackground: React.FC = () => {
     let mouseY = window.innerHeight / 2;
     let currentX = mouseX;
     let currentY = mouseY;
-    let animId: number;
-
-    const handlePointerMove = (e: PointerEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    };
+    let animId: number | null = null;
 
     const render = () => {
-      // Fluid lerp damping for weightless, subtle pointer spotlight
-      currentX += (mouseX - currentX) * 0.04;
-      currentY += (mouseY - currentY) * 0.04;
+      const dx = mouseX - currentX;
+      const dy = mouseY - currentY;
+      currentX += dx * 0.05;
+      currentY += dy * 0.05;
 
       if (auraRef.current) {
-        // `.aura` centres itself with a negative margin, so this is the raw
-        // pointer position rather than a corner offset.
         auraRef.current.style.transform = `translate3d(${currentX.toFixed(1)}px, ${currentY.toFixed(1)}px, 0)`;
+      }
+
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+        animId = null;
+        return;
       }
 
       animId = requestAnimationFrame(render);
     };
 
+    const startLoop = () => {
+      if (animId === null) {
+        animId = requestAnimationFrame(render);
+      }
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      startLoop();
+    };
+
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
-    render();
+    startLoop();
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
-      cancelAnimationFrame(animId);
+      if (animId !== null) cancelAnimationFrame(animId);
     };
   }, [reducedMotion]);
 

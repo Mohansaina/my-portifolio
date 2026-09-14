@@ -421,11 +421,10 @@ img {
   border-radius: 100%;
   background: radial-gradient(
     50% 50% at 50% 50%,
-    rgba(232, 217, 184, 0.048) 0%,
-    rgba(148, 163, 184, 0.025) 50%,
-    transparent 100%
+    rgba(232, 217, 184, 0.045) 0%,
+    rgba(148, 163, 184, 0.02) 45%,
+    transparent 85%
   );
-  filter: blur(80px);
   pointer-events: none;
 }
 
@@ -440,10 +439,9 @@ img {
   background: radial-gradient(
     circle,
     rgba(148, 163, 184, 0.035) 0%,
-    rgba(38, 41, 48, 0.02) 60%,
-    transparent 100%
+    rgba(38, 41, 48, 0.015) 50%,
+    transparent 75%
   );
-  filter: blur(120px);
   animation: os-mesh-drift-1 65s ease-in-out infinite alternate;
   will-change: transform;
 }
@@ -458,10 +456,9 @@ img {
   background: radial-gradient(
     circle,
     rgba(232, 217, 184, 0.025) 0%,
-    rgba(22, 24, 28, 0.03) 65%,
-    transparent 100%
+    rgba(22, 24, 28, 0.015) 50%,
+    transparent 75%
   );
-  filter: blur(140px);
   animation: os-mesh-drift-2 75s ease-in-out infinite alternate;
   will-change: transform;
 }
@@ -552,12 +549,10 @@ img {
 
 .reveal {
   opacity: 0;
-  transform: translate3d(0, 12px, 0);
-  filter: blur(6px);
+  transform: translate3d(0, 16px, 0);
   transition:
     opacity var(--dur-4) var(--ease),
-    transform var(--dur-4) var(--ease),
-    filter var(--dur-4) var(--ease);
+    transform var(--dur-4) var(--ease);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 }
@@ -565,7 +560,6 @@ img {
 .reveal.is-in {
   opacity: 1;
   transform: translate3d(0, 0, 0);
-  filter: blur(0);
 }
 
 /* ============================================================

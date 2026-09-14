@@ -40,33 +40,13 @@ export const CustomCursor: React.FC = () => {
     let y = -100;
     let ringX = -100;
     let ringY = -100;
-    let frame: number;
+    let frame: number | null = null;
     let seen = false;
 
-    const onMove = (e: PointerEvent) => {
-      x = e.clientX;
-      y = e.clientY;
-      if (!seen) {
-        seen = true;
-        ringX = x;
-        ringY = y;
-        if (dotRef.current) dotRef.current.style.opacity = "1";
-        if (ringRef.current) ringRef.current.style.opacity = "1";
-      }
-    };
-
-    const hide = () => {
-      if (dotRef.current) dotRef.current.style.opacity = "0";
-      if (ringRef.current) ringRef.current.style.opacity = "0";
-    };
-
-    // Spring rather than a plain lerp, so the ring carries momentum into a
-    // stop instead of easing to it. Damping is set high enough that it
-    // settles without visible oscillation.
     let vx = 0;
     let vy = 0;
-    const stiffness = 0.14;
-    const damping = 0.76;
+    const stiffness = 0.16;
+    const damping = 0.72;
 
     const render = () => {
       vx = (vx + (x - ringX) * stiffness) * damping;
@@ -80,17 +60,47 @@ export const CustomCursor: React.FC = () => {
       if (ringRef.current) {
         ringRef.current.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0)`;
       }
+
+      // Pause loop when ring has settled close to cursor
+      if (Math.abs(vx) < 0.01 && Math.abs(vy) < 0.01 && Math.abs(x - ringX) < 0.05 && Math.abs(y - ringY) < 0.05) {
+        frame = null;
+        return;
+      }
+
       frame = requestAnimationFrame(render);
+    };
+
+    const startLoop = () => {
+      if (frame === null) {
+        frame = requestAnimationFrame(render);
+      }
+    };
+
+    const onMove = (e: PointerEvent) => {
+      x = e.clientX;
+      y = e.clientY;
+      if (!seen) {
+        seen = true;
+        ringX = x;
+        ringY = y;
+        if (dotRef.current) dotRef.current.style.opacity = "1";
+        if (ringRef.current) ringRef.current.style.opacity = "1";
+      }
+      startLoop();
+    };
+
+    const hide = () => {
+      if (dotRef.current) dotRef.current.style.opacity = "0";
+      if (ringRef.current) ringRef.current.style.opacity = "0";
     };
 
     window.addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("pointerleave", hide);
-    frame = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerleave", hide);
-      cancelAnimationFrame(frame);
+      if (frame !== null) cancelAnimationFrame(frame);
     };
   }, [enabled]);
 

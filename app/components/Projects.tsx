@@ -33,42 +33,38 @@ const PROJECTS: ProjectData[] = [
       "Prisma",
       "PostgreSQL",
     ],
-    demoUrl: "https://jdjewells.vercel.app",
+    demoUrl: "https://jdjewellerylondon.co.uk",
     repoUrl: "https://github.com/Mohansaina/jdjewells",
-    image1: "/jdjewells_storefront.jpg",
-    image2: "/jdjewells_configurator.png",
+    image1: "/jdjewellery_banner.png",
+    image2: "/jdjewells_storefront.jpg",
   },
   {
-    id: "aurajewels",
-    title: "AuraJewels",
-    category: "Luxury e-commerce",
+    id: "speakenglishwithnick",
+    title: "Speak English With Nick",
+    category: "EdTech · E-learning platform",
     year: "2025",
     description:
-      "A jewelry storefront with a 3D ring configurator and live gold pricing.",
+      "An interactive English coaching portal with lesson booking, student dashboards and fluency analytics.",
     problem:
-      "Online jewelry buyers cannot handle the piece before paying for it, so confidence collapses at exactly the price point where it matters most.",
+      "Students and professional learners needed a frictionless platform to schedule 1-on-1 language coaching, access curated learning modules, and track fluency progress.",
     solution:
-      "A headless Next.js storefront with real-time gemstone customisation, diamond clarity selection, live gold price sync and multi-currency checkout.",
+      "A full e-learning web platform with automated booking schedules, student progress tracking, interactive lesson modules, and automated notifications.",
     features: [
-      "Interactive 3D diamond and gold ring builder",
-      "Live carat and gemstone pricing engine",
-      "Headless Next.js storefront on a Shopify backend",
-      "Multi-currency Stripe checkout",
+      "Interactive 1-on-1 lesson booking & calendar sync",
+      "Student fluency dashboard with progress metrics",
+      "Curated lesson notes, audio resources & quizzes",
+      "Automated email notifications & instant scheduling",
     ],
     techStack: [
       "React 19",
-      "Next.js 15",
-      "Three.js",
+      "Next.js",
+      "TypeScript",
       "Tailwind CSS",
-      "Shopify API",
-      "Stripe",
+      "Node.js",
     ],
-    /* No demoUrl or repoUrl: this one is not deployed publicly. The card
-       previously linked "Open live site" to "#services", which scrolled the
-       page instead of opening anything, and "Source" to the portfolio's own
-       repository. Both are now simply absent and the card says so. */
-    image1: "/jewelry_store_hero.png",
-    image2: "/jewelry_customizer_app.png",
+    demoUrl: "https://speakenglishwithnick.com",
+    image1: "/speakenglish_banner.png",
+    image2: "/speakenglishwithnick.jpg",
   },
   {
     id: "businesshelp",
@@ -97,8 +93,8 @@ const PROJECTS: ProjectData[] = [
     ],
     demoUrl: "https://mohansaina.github.io/businesshelp/",
     repoUrl: "https://github.com/Mohansaina/businesshelp",
-    image1: "/businesshelp_dashboard.png",
-    image2: "/businesshelp_analytics.png",
+    image1: "/reviewai_banner.png",
+    image2: "/businesshelp_dashboard.png",
   },
   {
     id: "clothesdryer",
@@ -124,10 +120,10 @@ const PROJECTS: ProjectData[] = [
       "OpenWeatherMap API",
       "Service Workers",
     ],
-    demoUrl: "http://mohansaina.github.io/freeclothesdryer/",
+    demoUrl: "https://clthesdryalert.qzz.io",
     repoUrl: "https://github.com/Mohansaina/freeclothesdryer",
-    image1: "/clothesdryer_app.png",
-    image2: "/clothesdryer_forecast.png",
+    image1: "/clothesdryer_banner.png",
+    image2: "/clothesdryer_app.png",
   },
   {
     id: "agriscan",
@@ -149,8 +145,8 @@ const PROJECTS: ProjectData[] = [
     techStack: ["React", "JavaScript", "Tesseract OCR", "Tailwind CSS", "PWA"],
     demoUrl: "https://mohansaina.github.io/AgriScan/",
     repoUrl: "https://github.com/Mohansaina/AgriScan",
-    image1: "/agriscan_scan.png",
-    image2: "/agriscan_dosage.png",
+    image1: "/agriscan_banner.png",
+    image2: "/agriscan_scan.png",
   },
 ];
 
@@ -196,6 +192,7 @@ const ProjectCard: React.FC<{
   onOpen: () => void;
 }> = ({ project, index, onOpen }) => {
   const { ref, onPointerMove } = usePointerLight<HTMLLIElement>();
+  const liveUrl = project.demoUrl;
 
   return (
     <li
@@ -207,19 +204,34 @@ const ProjectCard: React.FC<{
     >
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div className="relative aspect-[16/10] overflow-hidden border-b border-edge bg-ink-1 md:aspect-auto md:min-h-[22rem] md:border-b-0 md:border-r">
-          {/* Settle lives on the wrapper so the hover scale on the image
-              composes with it instead of being overridden. */}
-          <span className="img-zoom absolute inset-0 block">
-            <Image
-              src={project.image1}
-              alt=""
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover transition-transform duration-[var(--dur-5)]
-                ease-[var(--ease)] group-hover:scale-[1.02]"
-            />
-          </span>
-          {/* Drawn back off the artwork as the card arrives. */}
+          {liveUrl ? (
+            <a
+              href={liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="img-zoom absolute inset-0 block"
+            >
+              <Image
+                src={project.image1}
+                alt={project.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-[var(--dur-5)]
+                  ease-[var(--ease)] group-hover:scale-[1.02]"
+              />
+            </a>
+          ) : (
+            <span className="img-zoom absolute inset-0 block cursor-pointer" onClick={onOpen}>
+              <Image
+                src={project.image1}
+                alt={project.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-[var(--dur-5)]
+                  ease-[var(--ease)] group-hover:scale-[1.02]"
+              />
+            </span>
+          )}
           <span aria-hidden className="curtain" />
         </div>
 
@@ -228,20 +240,29 @@ const ProjectCard: React.FC<{
             <p className="t-label mb-4">
               {project.category} · {project.year}
             </p>
-            {/* The heading holds the control and stretches an invisible layer
-                over the whole card, so there is one tab stop, the accessible
-                name is the title, and the markup stays valid — a <button>
-                cannot legally wrap headings and paragraphs. */}
             <h3 className="t-heading">
-              <button
-                type="button"
-                onClick={onOpen}
-                className="stretch-target cursor-pointer text-left after:absolute
-                  after:inset-0 after:content-['']"
-              >
-                {project.title}
-                <span className="sr-only"> — view case study</span>
-              </button>
+              {liveUrl ? (
+                <a
+                  href={liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="stretch-target cursor-pointer text-left after:absolute
+                    after:inset-0 after:content-[''] hover:text-lume"
+                >
+                  {project.title}
+                  <span className="sr-only"> — visit live site</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onOpen}
+                  className="stretch-target cursor-pointer text-left after:absolute
+                    after:inset-0 after:content-['']"
+                >
+                  {project.title}
+                  <span className="sr-only"> — view case study</span>
+                </button>
+              )}
             </h3>
             <p className="t-body mt-4">{project.description}</p>
 
@@ -257,39 +278,61 @@ const ProjectCard: React.FC<{
             </ul>
           </div>
 
-          <p className="mt-8 inline-flex items-center gap-1.5 text-[13px] text-lume">
-            View case study
-            <Icon name="arrow-right" size={14} />
-          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            {liveUrl ? (
+              <>
+                <a
+                  href={liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative z-[3] inline-flex items-center gap-2 rounded-md bg-lume px-4 py-2 text-[13px] font-medium text-ink-0 transition-transform duration-[var(--dur-2)] hover:bg-lume-hi active:scale-95"
+                >
+                  <span>Visit live website</span>
+                  <Icon name="arrow-up-right" size={14} />
+                </a>
+                <button
+                  type="button"
+                  onClick={onOpen}
+                  className="relative z-[3] inline-flex items-center gap-1.5 text-[13px] text-text-mid transition-colors hover:text-text-hi"
+                >
+                  <span>Details</span>
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={onOpen}
+                className="relative z-[3] inline-flex items-center gap-1.5 text-[13px] text-lume"
+              >
+                <span>View case study</span>
+                <Icon name="arrow-right" size={14} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Lifted above the stretched layer so these stay independently
-          clickable. */}
-      {/* Lifted above the stretched layer so these stay independently
-          clickable. The label reports what is actually behind the icons —
-          it used to read "Live · Source" on every card, including one with
-          neither. */}
-      <div className="relative z-[2] flex items-center justify-between gap-4 border-t border-edge px-8 py-4">
+      <div className="relative z-[3] flex items-center justify-between gap-4 border-t border-edge px-8 py-4">
         <span className="t-label">
-          {project.demoUrl && project.repoUrl
-            ? "Live · Source"
-            : project.repoUrl
-              ? "Source"
-              : "Case study"}
+          {liveUrl && project.repoUrl
+            ? "Live Website · Source"
+            : liveUrl
+              ? "Live Website"
+              : project.repoUrl
+                ? "Source Code"
+                : "Case Study"}
         </span>
-        <span className="flex items-center gap-1">
-          {project.demoUrl && (
+        <span className="flex items-center gap-2">
+          {liveUrl && (
             <a
-              href={project.demoUrl}
+              href={liveUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${project.title} — open live site`}
-              className="grid h-10 w-10 place-items-center rounded-sm text-text-lo
-                transition-colors duration-[var(--dur-2)] hover:bg-ink-3
-                hover:text-text-hi active:translate-y-px"
+              className="inline-flex items-center gap-1.5 rounded-sm bg-ink-3 px-3 py-1.5 font-mono text-[12px] text-text-hi transition-colors duration-[var(--dur-2)] hover:bg-lume hover:text-ink-0"
             >
-              <Icon name="arrow-up-right" size={15} />
+              <span>Visit Live</span>
+              <Icon name="arrow-up-right" size={14} />
             </a>
           )}
           {project.repoUrl && (
@@ -298,7 +341,7 @@ const ProjectCard: React.FC<{
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${project.title} — view source`}
-              className="grid h-10 w-10 place-items-center rounded-sm text-text-lo
+              className="grid h-9 w-9 place-items-center rounded-sm text-text-lo
                 transition-colors duration-[var(--dur-2)] hover:bg-ink-3
                 hover:text-text-hi active:translate-y-px"
             >
